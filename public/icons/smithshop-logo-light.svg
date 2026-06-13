@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Grafika (https://www.grafika.cc/) -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2027.74" height="1223.8" viewBox="0 0 1013.87 611.9" preserveAspectRatio="xMidYMid meet">
+	<defs>
+		<filter id="filter_1" style="color-interpolation-filters:sRGB" primitiveUnits="userSpaceOnUse" x="-0.031" y="-0.042" width="1.062" height="1.085">
+			<feFlood result="flood" in="SourceGraphic" flood-color="#000000" flood-opacity="0" />
+			<feGaussianBlur result="blur" in="SourceGraphic" stdDeviation="3.85" />
+			<feOffset result="offset" in="blur" dx="0" dy="0" />
+			<feComposite result="composite" operator="in" in="flood" in2="offset" />
+			<feComposite result="dropShadow" operator="over" in="SourceGraphic" in2="composite" />
+		</filter>
+		<style type="text/css">@import url('https://fonts.googleapis.com/css?family=Another:4');@import url('https://fonts.googleapis.com/css?family=Simplisicky:4');@import url('https://fonts.googleapis.com/css?family=Noto+Sans:4');</style>
+	</defs>
+	<g transform="matrix(1, 0, 0, 1, 303.1629943847656, 553.181640625)">
+		<text transform="matrix(2.7072532176971436, -0.007284944877028465, 0.007284944877028465, 2.7072532176971436, -28.511959075927734, -258.8546142578125)" text-anchor="middle" x="0" y="15.39" font-size="98.66822581429676px" font-style="normal" font-weight="400" font-family="Another" style="fill:#FFFFFF;">Smith</text>
+		<text transform="matrix(1.8046573400497437, 0, 0, 1.8046573400497437, 389.21051025390625, -213.78717041015625)" text-anchor="middle" x="0" y="21.7" font-size="106.89067854785876px" font-style="normal" font-weight="400" font-family="Simplisicky" style="fill:#FFFFFF;filter:url(#filter_1)">Shop</text>
+		<text transform="matrix(2.5568268299102783, 1.2319974899291992, -1.2319974899291992, 2.5568268299102783, 285.40216064453125, -460.98175048828125)" text-anchor="middle" x="0" y="11.98" font-size="35.60235586160563px" font-style="normal" font-weight="400" font-family="Noto Sans" style="fill:#000000;">👑</text>
+		<path d="M-153.82,-16.39 L-137.39,-15.71 Q-120.96,-15.02 -94.27,-19.13 Q-67.57,-23.24 -35.4,-28.72 Q-3.23,-34.2 31.68,-39.68 Q66.59,-45.15 102.87,-49.26 Q139.14,-53.37 174.05,-57.48 Q208.96,-61.59 241.13,-65.01 Q273.3,-68.44 297.26,-71.86 Q321.22,-75.29 339.01,-76.66 Q356.81,-78.03 339.01,-73.23 Q321.22,-68.44 293.84,-58.17 Q266.46,-47.89 234.97,-35.57 L203.49,-23.24 L177.47,-12.97 Q151.46,-2.69 132.3,4.15 Q113.13,11 152.83,4.84 Q192.53,-1.32 223.34,-8.17 Q254.14,-15.02 280.15,-19.82 Q306.16,-24.61 326.69,-27.35 Q347.23,-30.09 362.97,-28.03 Q378.71,-25.98 362.97,-8.86 Q347.23,8.26 361.6,24.01 Q375.98,39.77 410.2,42.51 Q444.43,45.25 488.23,43.88 L696.32,38.4" fill-rule="evenodd" style="fill:none;stroke:#FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-width:28.78;" />
+		<path d="M671.78,-42.46 L674.71,-44.66 L680.56,-39.53" fill-rule="evenodd" style="fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:28.78;" />
+	</g>
+</svg>
