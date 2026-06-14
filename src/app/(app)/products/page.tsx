@@ -1,11 +1,9 @@
 'use client'
 
-import { productsList } from '@/data/products-list' // adjust path
-import { ProductCard } from '@/components/ui/core/product-card'
+import { productsList } from '@/data/products-list'
+import { ProductCard } from '@/components/registries/product-card'
 import { Opening } from '@/components/shared/opening'
-import { ProductCardProps } from '@/components/ui/core/product-card'
 import { mapItemToCardProps } from '@/utils/product'
-
 
 export default function ProductsPage() {
    return (

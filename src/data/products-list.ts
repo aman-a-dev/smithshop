@@ -24,7 +24,7 @@ interface PremiumItem {
 }
 
 // Union type for all possible product items in the "items" array
-type ProductItem = PriceAmountItem | LevelUpItem | MembershipItem | PremiumItem
+export type ProductItem = PriceAmountItem | LevelUpItem | MembershipItem | PremiumItem
 
 // A product group inside a category
 interface ProductGroup {

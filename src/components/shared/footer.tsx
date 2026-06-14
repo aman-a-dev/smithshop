@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import Logo from '@/components/shared/logo'
 
 const links = [
    {
@@ -29,13 +30,7 @@ export default function Footer() {
                aria-label='go home'
                className='mx-auto block size-fit'
             >
-               <Image
-                  src='/icons/logo.png'
-                  alt='Logo'
-                  width={100}
-                  height={100}
-                  className='h-auto'
-               />
+               <Logo /> 
             </Link>
 
             <div className='my-8 flex flex-wrap justify-center gap-6 text-sm'>

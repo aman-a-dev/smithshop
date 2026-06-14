@@ -1,16 +1,16 @@
-import CardNav from '@/components/ui/core/card-nav'
+import CardNav from '@/components/registries/card-nav'
 
 export default function NavBar() {
    const items = [
       {
          label: 'Products',
          links: [
-            { label: 'Gaming', ariaLabel: 'Gaming', url: '/' },
-            { label: 'Level up', ariaLabel: 'levelup', url: '/' },
+            { label: 'Gaming', ariaLabel: 'Gaming', url: '/products'  },
+            { label: 'Level up', ariaLabel: 'levelup', url: '/products' },
             {
                label: 'Social media',
                ariaLabel: 'Social media',
-               url: '/'
+               url: '/products' 
             }
          ]
       },
@@ -38,12 +38,6 @@ export default function NavBar() {
          ]
       }
    ]
-   
-   return (
-      <CardNav
-         logo='/icons/logo.png'
-         items={items}
-      />
-   )
-}
 
+   return <CardNav items={items} />
+}

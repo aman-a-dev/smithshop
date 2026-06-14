@@ -9,9 +9,9 @@ import {
 } from 'react'
 import { gsap } from 'gsap'
 import { ExternalLink } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { cn } from '@/lib/utils' 
+import { cn } from '@/lib/utils'
+import Logo from '@/components/shared/logo'
 
 type CardNavLink = {
    label: string
@@ -25,16 +25,12 @@ export type CardNavItem = {
 }
 
 export interface CardNavProps {
-   logo: string
-   logoAlt?: string
    items: CardNavItem[]
    className?: string
    ease?: string
 }
 
 export default function CardNav({
-   logo,
-   logoAlt = 'Logo',
    items,
    className = '',
    ease = 'power3.inOut'
@@ -145,13 +141,7 @@ export default function CardNav({
                href='/'
                className='relative flex items-center h-8 w-28 shrink-0'
             >
-               <Image
-                  src={logo}
-                  alt={logoAlt}
-                  fill
-                  style={{ objectFit: 'contain', objectPosition: 'left' }}
-                  priority
-               />
+               <Logo />
             </Link>
 
             <button

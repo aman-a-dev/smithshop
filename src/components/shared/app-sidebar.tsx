@@ -12,15 +12,16 @@ import {
 import {
    IconBuildingStore,
    IconShoppingCartCopy,
-   IconLayout2,
    IconInfoSquare,
    IconAddressBook,
    IconBellRinging2,
    IconHeartPlus
 } from '@tabler/icons-react'
-import { NavUser } from '@/components/ui/core/nav-user'
+import { NavUser } from '@/components/registries/nav-user'
 import type { ElementType } from 'react'
 import { useSession } from '@/lib/auth-client'
+import { hulkFont } from '@/fonts/font'
+import { cn } from '@/lib/utils'
 
 interface NavItem {
    id: string
@@ -30,37 +31,46 @@ interface NavItem {
    isActive?: boolean
 }
 
-interface User {
-   name: string
-   email: string
-   avatar: string
-}
-
 interface SidebarData {
-   user: User
    navMain: NavItem[]
 }
 
 export default function AppSidebar({
    ...props
 }: React.ComponentProps<typeof Sidebar>) {
-   const { data: session } = useSession()
+   //const { data: session } = useSession()
+   const session = {
+      user: {
+         name: 'Amanuel Antenh',
+         email: 'amanuelantenha@gmail.com',
+         avatar: '/'
+      }
+   }
    const user = {
-      name: 'Guest' || session?.name,
-      email: '' || session?.email,
-      avatar: '' || session?.image,
-      guest: session ? false : true
+      name: session?.user?.name,
+      email: session?.user?.email,
+      avatar: session?.user?.avatar,
+      guest: true || (session ? false : true)
    }
    return (
       <Sidebar {...props}>
          <SidebarHeader>
-            <div>Hello</div>
+            <h1
+               className={cn(
+                  hulkFont.className,
+                  'scroll-m-20 text-center text-2xl md:text-5xl lg:text-6xl font-extrabold tracking-tight',
+                  'bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent',
+                  'max-w-2xl mx-auto'
+               )}
+            >
+               Smithshop
+            </h1>
          </SidebarHeader>
          <SidebarContent>
             <NavMain items={data.navMain} />
          </SidebarContent>
-         <SidebarFooter user={user}>
-            <NavUser />
+         <SidebarFooter>
+            <NavUser user={session.user} />
          </SidebarFooter>
       </Sidebar>
    )
@@ -89,13 +99,6 @@ function NavMain({ items }: { items: NavItem[] }) {
 
 const data: SidebarData = {
    navMain: [
-      {
-         id: 'overview',
-         title: 'Overview',
-         url: '/',
-         icon: IconLayout2,
-         isActive: true
-      },
       {
          id: 'products',
          title: 'Products',

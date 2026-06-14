@@ -1,3 +1,5 @@
+import { ProductCardProps } from '@/components/registries/product-card'
+import { ProductItem } from '@/data/products-list'
 // Helper to get a human-readable title from an item
 function getProductTitle(item: ProductItem, type: string): string {
    if ('amount' in item) {
@@ -15,6 +17,39 @@ function getProductTitle(item: ProductItem, type: string): string {
    }
    return 'Unknown'
 }
+export function getImage(id: string) {
+   switch (id) {
+      case 'free-fire':
+         return 'ff'
+         break
+      case 'roblox':
+         return 'rb'
+         break
+      case 'call-of-duty':
+         return 'cod'
+         break
+      case 'blood-strike':
+         return 'bs'
+         break
+      case 'efootball':
+         return 'efb'
+         break
+      case 'instagram':
+         return 'default'
+         break
+      case 'tiktok':
+         return 'default'
+         break
+      case 'telegram':
+         return 'tg'
+         break
+      case 'pubg-mobile':
+         return 'pg'
+         break
+      default:
+         return 'default'
+   }
+}
 
 // Map a ProductItem + context to a ProductCard-friendly object
 export function mapItemToCardProps(
@@ -27,7 +62,7 @@ export function mapItemToCardProps(
       id: `${categoryId}-${type}-${index}`,
       title: getProductTitle(item, type),
       price: item.price,
-      image: '/images/game-placeholder.png', // use a generic or per-category placeholder
+      image: `/images/${getImage(categoryId)}.png`, // use a generic or per-category placeholder
       badge: type.charAt(0).toUpperCase() + type.slice(1), // e.g. "Diamond"
       // optional: you can pass originalPrice if you ever have discounts
       currency: 'ETB'
