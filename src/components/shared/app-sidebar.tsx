@@ -28,7 +28,7 @@ interface NavItem {
    id: string
    title: string
    icon: ElementType
-   url?: string
+   url: string
    isActive?: boolean
 }
 
@@ -36,7 +36,6 @@ interface SidebarData {
    navMain: NavItem[]
 }
 
-// Move data definition before component for clarity
 const data: SidebarData = {
    navMain: [
       {
@@ -75,15 +74,14 @@ const data: SidebarData = {
 export default function AppSidebar({
    ...props
 }: React.ComponentProps<typeof Sidebar>) {
-   const { data: session } = useSession()   // ✅ real session hook
+   const { data: session } = useSession()
 
-   // Determine guest status based on session existence
    const isLoggedIn = !!session?.user
    const user = {
       name: session?.user?.name ?? '',
       email: session?.user?.email,
-      avatar: session?.user?.avatar,
-      guest: !isLoggedIn   // ✅ true when no session
+      avatar: session?.user?.image ?? undefined, // Convert null to undefined
+      guest: !isLoggedIn
    }
 
    return (

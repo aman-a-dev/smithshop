@@ -31,10 +31,10 @@ interface InfoModalProps {
 export function InfoModal({ open, onOpenChange, product }: InfoModalProps) {
   const hasDiscount =
     product.originalPrice !== undefined && product.originalPrice > product.price
-  const discountPercent = hasDiscount
-    ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100
-      )
+  
+  // Safe calculation: only compute if hasDiscount is true
+  const discountPercent = hasDiscount && product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0
 
   return (
@@ -63,7 +63,7 @@ export function InfoModal({ open, onOpenChange, product }: InfoModalProps) {
               <span className='text-2xl font-bold'>
                 {product.currency} {product.price}
               </span>
-              {hasDiscount && (
+              {hasDiscount && product.originalPrice && (
                 <>
                   <span className='text-muted-foreground line-through'>
                     {product.currency} {product.originalPrice}

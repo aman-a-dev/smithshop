@@ -74,7 +74,7 @@ export function ReportModal({
         <div className='grid gap-4 py-2'>
           <div className='grid gap-2'>
             <Label htmlFor='reason'>Reason *</Label>
-            <Select value={reason} onValueChange={setReason}>
+            <Select value={reason} onValueChange={(value) => setReason(value ?? '')}>
               <SelectTrigger id='reason'>
                 <SelectValue placeholder='Select a reason' />
               </SelectTrigger>
