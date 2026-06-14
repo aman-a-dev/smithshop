@@ -6,15 +6,20 @@ import {
 import AppSidebar from '@/components/shared/app-sidebar'
 import ToggleTheme from '@/components/shared/toggle-theme'
 import Footer from '@/components/shared/footer'
+// app/layout.tsx
+import { FavoritesProvider } from '@/providers/favourites-context'
+import { CartProvider } from '@/contexts/cart-context'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
    return (
       <>
-         <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-               <header
-                  className={`
+         <FavoritesProvider>
+         <CartProvider>
+            <SidebarProvider>
+               <AppSidebar />
+               <SidebarInset>
+                  <header
+                     className={`
                      fixed inset-x-2 top-2 z-50 mx-auto 
                      flex h-16 shrink-0 items-center justify-between gap-2 
                      overflow-hidden rounded-[32px] border border-border 
@@ -31,21 +36,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                      
                      /* Extra large (xl) – keep max-w-7xl */
                   `}
-               >
-                  <div className='flex items-center gap-2 px-4'>
-                     <SidebarTrigger className='sm:hidden' />
-                  </div>
-                  <div className='flex items-center gap-2 px-4'>
-                     <ToggleTheme
-                        duration={600}
-                        animationType='diag-down-right'
-                     />
-                  </div>
-               </header>
-               {children}
-            </SidebarInset>
-         </SidebarProvider>
-         <Footer />
+                  >
+                     <div className='flex items-center gap-2 px-4'>
+                        <SidebarTrigger className='sm:hidden' />
+                     </div>
+                     <div className='flex items-center gap-2 px-4'>
+                        <ToggleTheme
+                           duration={600}
+                           animationType='diag-down-right'
+                        />
+                     </div>
+                  </header>
+                  {children}
+               </SidebarInset>
+            </SidebarProvider>
+            <Footer />
+                     </CartProvider>
+
+         </FavoritesProvider>
       </>
    )
 }

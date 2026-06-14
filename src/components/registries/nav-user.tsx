@@ -1,7 +1,8 @@
 'use client'
 
-import { BadgeCheck, ChevronsUpDown, CreditCard, LogOut } from 'lucide-react'
+import {LogIn, BadgeCheck, ChevronsUpDown, CreditCard, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -33,14 +34,14 @@ export function NavUser({
    }
 }) {
    const { isMobile } = useSidebar()
-   const isGuest = user.guest || true
+   const isGuest = user.guest === true // ✅ correctly evaluate guest status
 
    // Styling to match SidebarMenuButton (size="lg")
    const triggerClasses = cn(
       'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm',
       'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
       'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground',
-      'h-12' // size="lg" equivalent
+      'h-12'
    )
 
    return (
@@ -83,8 +84,13 @@ export function NavUser({
                   {isGuest ? (
                      <DropdownMenuGroup>
                         <DropdownMenuItem>
-                           <BadgeCheck />
-                           Log in
+                           <Link
+                              href='/auth'
+                              className='flex w-full items-center'
+                           >
+                              <LogIn />
+                              Log in
+                           </Link>
                         </DropdownMenuItem>
                      </DropdownMenuGroup>
                   ) : (
@@ -98,7 +104,7 @@ export function NavUser({
                                        alt={user.name}
                                     />
                                     <AvatarFallback className='rounded-lg'>
-                                       CN
+                                       {user.name?.charAt(0) || 'U'}
                                     </AvatarFallback>
                                  </Avatar>
                                  <div className='grid flex-1 text-left text-sm leading-tight'>
@@ -124,7 +130,7 @@ export function NavUser({
                            </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => signOut()}>
                            <LogOut />
                            Log out
                         </DropdownMenuItem>

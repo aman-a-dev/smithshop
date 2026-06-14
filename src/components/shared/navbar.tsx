@@ -5,20 +5,13 @@ export default function NavBar() {
       {
          label: 'Products',
          links: [
-            { label: 'Gaming', ariaLabel: 'Gaming', url: '/products'  },
+            { label: 'Gaming', ariaLabel: 'Gaming', url: '/products' },
             { label: 'Level up', ariaLabel: 'levelup', url: '/products' },
             {
                label: 'Social media',
                ariaLabel: 'Social media',
-               url: '/products' 
+               url: '/products'
             }
-         ]
-      },
-      {
-         label: 'About',
-         links: [
-            { label: 'Company', ariaLabel: 'About Company', url: '/' },
-            { label: 'Careers', ariaLabel: 'About Careers', url: '/' }
          ]
       },
       {
@@ -35,6 +28,14 @@ export default function NavBar() {
                url: 'https://t.me/Ethiosmith'
             },
             { label: 'Telegram Group', ariaLabel: 'Telegram Group', url: '/' }
+         ]
+      },
+      {
+         label: 'More',
+         links: [
+            { label: 'Company', ariaLabel: 'About Company', url: '/about' },
+            { label: 'Login', ariaLabel: 'Login', url: '/auth' },
+            { label: 'Register', ariaLabel: 'Create account', url: '/auth' }
          ]
       }
    ]
