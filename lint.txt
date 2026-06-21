@@ -1,0 +1,69 @@
+
+> nextjs@0.1.0 lint
+> eslint
+
+
+/data/data/com.termux/files/home/projects/smithshop/src/app/(app)/profile/page.tsx
+  107:7  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/data/data/com.termux/files/home/projects/smithshop/src/app/(app)/profile/page.tsx:107:7
+  105 |
+  106 |    const isDirty =
+> 107 |       inputRef.current?.value?.trim() !== session.user.name?.trim() ?? false
+      |       ^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  108 |
+  109 |    return (
+  110 |       <div className='container mt-30 py-8 px-4 max-w-2xl mx-auto'>                                      react-hooks/refs
+  107:7  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/data/data/com.termux/files/home/projects/smithshop/src/app/(app)/profile/page.tsx:107:7
+  105 |
+  106 |    const isDirty =
+> 107 |       inputRef.current?.value?.trim() !== session.user.name?.trim() ?? false
+      |       ^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  108 |
+  109 |    return (
+  110 |       <div className='container mt-30 py-8 px-4 max-w-2xl mx-auto'>                               react-hooks/refs
+  107:7  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/data/data/com.termux/files/home/projects/smithshop/src/app/(app)/profile/page.tsx:107:7
+  105 |
+  106 |    const isDirty =
+> 107 |       inputRef.current?.value?.trim() !== session.user.name?.trim() ?? false
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  108 |
+  109 |    return (
+  110 |       <div className='container mt-30 py-8 px-4 max-w-2xl mx-auto'>                         react-hooks/refs
+  107:7  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/data/data/com.termux/files/home/projects/smithshop/src/app/(app)/profile/page.tsx:107:7
+  105 |
+  106 |    const isDirty =
+> 107 |       inputRef.current?.value?.trim() !== session.user.name?.trim() ?? false
+      |       ^^^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  108 |
+  109 |    return (
+  110 |       <div className='container mt-30 py-8 px-4 max-w-2xl mx-auto'>        react-hooks/refs
+  107:7  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/data/data/com.termux/files/home/projects/smithshop/src/app/(app)/profile/page.tsx:107:7
+  105 |
+  106 |    const isDirty =
+> 107 |       inputRef.current?.value?.trim() !== session.user.name?.trim() ?? false
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  108 |
+  109 |    return (
+  110 |       <div className='container mt-30 py-8 px-4 max-w-2xl mx-auto'>  react-hooks/refs
+
+✖ 5 problems (5 errors, 0 warnings)
+

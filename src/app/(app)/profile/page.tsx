@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from '@/lib/auth-client'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,7 @@ export default function ProfilePage() {
    const { data: session, isPending, refetch } = useSession()
    const [name, setName] = useState('')
    const [isSubmitting, setIsSubmitting] = useState(false)
-   const [isDirty, setIsDirty] = useState(false)
+   const userEdited = useRef(false)
 
    // Redirect if not authenticated
    useEffect(() => {
@@ -32,27 +32,27 @@ export default function ProfilePage() {
       }
    }, [session, isPending, router])
 
-   // Populate name when session loads
+   // Populate name from session when it loads, but only if user hasn't edited
    useEffect(() => {
-      if (session?.user?.name) {
+      if (session?.user?.name && !userEdited.current) {
          setName(session.user.name)
-         setIsDirty(false)
       }
    }, [session])
 
    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setName(e.target.value)
-      setIsDirty(e.target.value !== session?.user?.name)
+      userEdited.current = true
    }
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault()
       if (!session?.user) return
-      if (!isDirty) {
+      const trimmedName = name.trim()
+      if (trimmedName === session.user.name) {
          toast.info('No changes to save')
          return
       }
-      if (!name.trim()) {
+      if (!trimmedName) {
          toast.error('Name cannot be empty')
          return
       }
@@ -62,12 +62,13 @@ export default function ProfilePage() {
          const res = await fetch('/api/user/update', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name.trim() })
+            body: JSON.stringify({ name: trimmedName })
          })
          if (!res.ok) throw new Error('Update failed')
-         await refetch() // refresh session
+         await refetch()
          toast.success('Profile updated')
-         setIsDirty(false)
+         userEdited.current = false
+         // session will update and effect will set name to new value
       } catch (error) {
          toast.error('Something went wrong')
          console.error(error)
@@ -79,16 +80,17 @@ export default function ProfilePage() {
    // Loading state
    if (isPending) {
       return (
-         <div className='container mx-auto py-10 flex justify-center'>
-            <Card className='w-full max-w-md'>
+         <div className="container mt-30 py-10 flex justify-center">
+            <Card className="w-full max-w-md">
                <CardHeader>
-                  <Skeleton className='h-8 w-3/4' />
-                  <Skeleton className='h-4 w-1/2' />
+                  <Skeleton className="h-8 w-full" />
                </CardHeader>
-               <CardContent className='space-y-4'>
-                  <Skeleton className='h-20 w-20 rounded-full mx-auto' />
-                  <Skeleton className='h-10 w-full' />
-                  <Skeleton className='h-10 w-full' />
+               <CardContent className="space-y-4">
+                  <Skeleton className="h-20 w-20 rounded-full mx-auto" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
                </CardContent>
             </Card>
          </div>
@@ -98,61 +100,65 @@ export default function ProfilePage() {
    // After redirect, don't render form
    if (!session?.user) return null
 
-   return (
-      <div className='container mx-auto py-8 px-4 max-w-2xl'>
-         <div className='flex justify-center mb-8'>
-            <AppleHelloEffectEnglish className='text-primary' />
-         </div>
+   const isDirty = name.trim() !== session.user.name?.trim()
 
+   return (
+      <div className="container mt-30 py-8 px-4 max-w-2xl mx-auto">
          <Card>
-            <CardHeader className='text-center'>
-               <div className='flex justify-center mb-4'>
+            <CardHeader className="text-center">
+               <div className="flex items-center justify-center w-full">
+                  <AppleHelloEffectEnglish className="text-primary text-center" />
+               </div>
+               <div className="flex items-center gap-2 my-4">
                   <FallbackAvatar
                      name={session.user.name}
                      size={96}
                      animated
-                     className='ring-4 ring-primary/20'
+                     className="ring-4 ring-primary/20"
                   />
+                  <div>
+                     <CardTitle className="text-2xl">
+                        {session.user.name}
+                     </CardTitle>
+                     <CardDescription className="text-muted-foreground">
+                        {session.user.email}
+                     </CardDescription>
+                  </div>
                </div>
-               <CardTitle className='text-2xl'>Your Profile</CardTitle>
-               <CardDescription>Update your display name</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
-               <CardContent className='space-y-4'>
-                  <div className='space-y-2'>
-                     <label
-                        htmlFor='name'
-                        className='text-sm font-medium'
-                     >
+               <CardContent className="space-y-4 mb-4">
+                  <div className="space-y-2">
+                     <label htmlFor="name" className="text-sm font-medium">
                         Display name
                      </label>
                      <Input
-                        id='name'
+                        id="name"
                         value={name}
                         onChange={handleNameChange}
-                        placeholder='Your name'
+                        placeholder="Your name"
                         disabled={isSubmitting}
                      />
-                     <p className='text-xs text-muted-foreground'>
+                     <p className="text-xs text-muted-foreground">
                         Your email is <strong>{session.user.email}</strong> and
                         cannot be changed here.
                      </p>
                   </div>
                </CardContent>
-               <CardFooter className='flex justify-end gap-4'>
+               <CardFooter className="flex justify-end gap-4">
                   <Button
-                     type='button'
-                     variant='outline'
+                     type="button"
+                     variant="outline"
                      onClick={() => {
                         setName(session.user.name)
-                        setIsDirty(false)
+                        userEdited.current = false
                      }}
                      disabled={isSubmitting}
                   >
                      Cancel
                   </Button>
                   <Button
-                     type='submit'
+                     type="submit"
                      disabled={isSubmitting || !isDirty}
                   >
                      {isSubmitting ? 'Saving...' : 'Save changes'}

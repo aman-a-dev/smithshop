@@ -1,4 +1,3 @@
-// app/favourites/page.tsx
 'use client'
 
 import { useFavorites } from '@/providers/favourites-context'
@@ -6,8 +5,9 @@ import { productsList } from '@/data/products-list'
 import { ProductCard } from '@/components/registries/product-card'
 import { mapItemToCardProps } from '@/utils/product'
 import { Button } from '@/components/ui/button'
+import { HeartIcon } from 'lucide-react'
+import { Intro } from '@/components/shared/intro'
 import Link from 'next/link'
-import { HeartIcon } from 'lucide-react' // or any empty heart icon
 
 export default function FavouritesPage() {
    const { favourites } = useFavorites()
@@ -35,42 +35,39 @@ export default function FavouritesPage() {
 
    if (favouriteProducts.length === 0) {
       return (
-         <main className='container mx-auto px-4 py-16 mt-20 text-center'>
-            <div className='flex flex-col items-center gap-4'>
+         <Intro
+            heading='No favourites yet'
+            paragraph='Start adding products you love. They will appear here.'
+            badge='Favourites'
+            icon={
                <HeartIcon
                   className='h-16 w-16 text-muted-foreground/40'
                   strokeWidth={1.5}
                />
-               <h1 className='text-3xl font-bold tracking-tight'>
-                  No favourites yet
-               </h1>
-               <p className='text-muted-foreground max-w-md'>
-                  Start adding products you love. They will appear here.
-               </p>
-               <Button
-                  
-                  className='mt-2'
-               >
+            }
+            className='mt-30'
+         >
+            <div className='flex flex-col items-center gap-4'>
+               <Button className='mt-2'>
                   <Link href='/products'>Browse products</Link>
                </Button>
             </div>
-         </main>
+         </Intro>
       )
    }
 
    return (
       <main className='container mx-auto px-4 py-8 mt-20'>
-         <div className='mb-8 flex items-center justify-between'>
-            <div>
-               <h1 className='text-3xl font-bold tracking-tight'>
-                  Your favourites
-               </h1>
-               <p className='text-muted-foreground mt-1'>
-                  {favouriteProducts.length} item
-                  {favouriteProducts.length !== 1 && 's'}
-               </p>
-            </div>
-         </div>
+         <Intro
+            heading='Your favourites'
+            paragraph="Your bookmarked products 🛍"
+            badge='Favourites'
+         >
+            <p className='text-muted-foreground mt-1'>
+               {favouriteProducts.length} item
+               {favouriteProducts.length !== 1 && 's'}
+            </p>
+         </Intro>
 
          <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
             {favouriteProducts.map(props => (

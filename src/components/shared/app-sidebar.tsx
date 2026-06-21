@@ -8,7 +8,8 @@ import {
    SidebarMenu,
    SidebarMenuButton,
    SidebarMenuItem,
-   SidebarFooter
+   SidebarFooter,
+   useSidebar
 } from '@/components/ui/sidebar'
 import {
    IconBuildingStore,
@@ -23,6 +24,7 @@ import { useSession } from '@/lib/auth-client'
 import { hulkFont } from '@/fonts/font'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface NavItem {
    id: string
@@ -109,13 +111,27 @@ export default function AppSidebar({
 }
 
 function NavMain({ items }: { items: NavItem[] }) {
+   const { toggleSidebar } = useSidebar()
+   const isMobile = useIsMobile()
+   
+   const handleSideBarItemClick = () => {
+     if(isMobile){
+       toggleSidebar()
+     }else{
+       return null
+     }
+   }
    return (
       <SidebarGroup>
          <SidebarMenu>
             {items.map(item => {
                const Icon = item.icon
                return (
-                  <Link key={item.id} href={item.url}>
+                  <Link
+                     key={item.id}
+                     href={item.url}
+                     onClick={handleSideBarItemClick}
+                  >
                      <SidebarMenuItem>
                         <SidebarMenuButton tooltip={item.title}>
                            {Icon && <Icon className='mr-2 h-4 w-4' />}

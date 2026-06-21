@@ -20,10 +20,9 @@ import {
    IconShoppingBag
 } from '@tabler/icons-react'
 import { useFavorites } from '@/providers/favourites-context'
-import { useCart } from '@/contexts/cart-context'
-import { ReportModal } from '@/components/modals/report-modal'
-import { InfoModal } from '@/components/modals/info-modal'
-import { toast } from 'sonner'
+import { useCart } from '@/providers/cart-context'
+import { ReportModal } from '@/components/custom/report-modal'
+import { InfoModal } from '@/components/custom/info-modal'
 
 const SPRING = {
    type: 'spring' as const,
@@ -463,11 +462,11 @@ export function ProductCard({
                         <IconDotsVertical className='h-4 w-4' />
                      </DropdownMenuTrigger>
                      <DropdownMenuContent align='end'>
-                        <DropdownMenuItem onSelect={() => setInfoOpen(true)}>
+                        <DropdownMenuItem onClick={() => setInfoOpen(true)}>
                            <IconInfoSquareRounded className='mr-2 h-4 w-4' />
                            Info
                         </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setReportOpen(true)}>
+                        <DropdownMenuItem onClick={() => setReportOpen(true)}>
                            <IconFlag3 className='mr-2 h-4 w-4' />
                            Report
                         </DropdownMenuItem>

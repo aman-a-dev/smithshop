@@ -24,7 +24,11 @@ interface PremiumItem {
 }
 
 // Union type for all possible product items in the "items" array
-export type ProductItem = PriceAmountItem | LevelUpItem | MembershipItem | PremiumItem
+export type ProductItem =
+   | PriceAmountItem
+   | LevelUpItem
+   | MembershipItem
+   | PremiumItem
 
 // A product group inside a category
 interface ProductGroup {
@@ -65,7 +69,7 @@ export const productsList: ProductsList = {
                   { amount: 6160, price: 10880 }
                ]
             },
-            {
+            /*{
                type: 'level-up',
                items: [
                   { level: 6, diamonds: 120, price: 90 },
@@ -84,7 +88,7 @@ export const productsList: ProductsList = {
                   { name: 'Super Monthly', price: 2500 },
                   { name: 'Booyah Pass', price: 300 }
                ]
-            }
+            }*/
          ]
       },
       {
@@ -118,8 +122,8 @@ export const productsList: ProductsList = {
                ]
             }
          ]
-      },
-      {
+      }
+      /*{
          id: 'telegram',
          name: 'Telegram',
          slug: 'telegram',
@@ -261,6 +265,6 @@ export const productsList: ProductsList = {
                ]
             }
          ]
-      }
+      }*/
    ]
 }

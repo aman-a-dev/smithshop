@@ -1,13 +1,14 @@
 'use client'
 
-import { useCart } from '@/contexts/cart-context'
+import { useCart } from '@/providers/cart-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
-import { Trash2, Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react'
+import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Intro } from '@/components/shared/intro'
 
 export default function CartPage() {
    const {
@@ -21,35 +22,33 @@ export default function CartPage() {
 
    if (items.length === 0) {
       return (
-         <div className='container mx-auto mt-30 px-4 py-16 text-center'>
-            <ShoppingBag className='mx-auto h-16 w-16 text-muted-foreground' />
-            <h1 className='mt-4 text-2xl font-bold'>Your cart is empty</h1>
-            <p className='mt-2 text-muted-foreground'>
-               Looks like you haven't added anything yet.
-            </p>
-            <Link
-               href='/products'
-               passHref
+         <main className='container mx-auto mt-40 px-4 py-16 text-center'>
+            <Intro
+               heading='Your cart is empty'
+               paragraph="Looks like you haven't added anything yet."
+               badge='Cart'
+               icon={
+                  <ShoppingBag className='mx-auto h-16 w-16 text-muted-foreground' />
+               }
             >
-               <Button className='mt-6'>Continue Shopping</Button>
-            </Link>
-         </div>
+               <Link href='/products'>
+                  <Button className='mt-6'>Continue Shopping</Button>
+               </Link>
+            </Intro>
+         </main>
       )
    }
 
    return (
-      <div className='container mx-auto px-4 py-8 max-w-6xl'>
-         <div className='flex items-center gap-4 mb-8'>
-            <Link href='/products'>
-               <Button
-                  variant='ghost'
-                  size='icon'
-               >
-                  <ArrowLeft className='h-5 w-5' />
-               </Button>
-            </Link>
-            <h1 className='text-3xl font-bold'>Your Cart ({totalItems})</h1>
-         </div>
+      <main className='container mx-auto px-5 py-8 max-w-6xl'>
+         <Intro
+            heading={`Your Cart (${totalItems})`}
+            paragraph='Prepared products in your cart 🛒'
+            badge='Cart'
+            icon={
+               <ShoppingBag className='mx-auto h-16 w-16 text-muted-foreground' />
+            }
+         />
 
          <div className='grid lg:grid-cols-3 gap-8'>
             {/* Cart items */}
@@ -199,6 +198,6 @@ export default function CartPage() {
                </Card>
             </div>
          </div>
-      </div>
+      </main>
    )
 }

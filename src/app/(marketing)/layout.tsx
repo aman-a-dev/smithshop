@@ -15,3 +15,9 @@ export default function MarketingLayout({
       </>
    )
 }
+
+
+export const metadata: Metadata = {
+   title: 'Smithshop',
+   description: 'Gaming and Social media marketplace'
+}

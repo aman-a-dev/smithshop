@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { motion, useTransform } from 'motion/react'
+import { motion, useTransform, MotionValue } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
 import { useScroll, cancelFrame, frame } from 'motion/react'
@@ -10,10 +10,11 @@ import { ReactLenis } from 'lenis/react'
 import type { LenisRef } from 'lenis/react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+
 interface CardProps {
    id: number
    className?: string
-   progress: any
+   progress: MotionValue<number>  // fixed: explicitly typed
    range: number[]
    targetScale: number
    children?: React.ReactNode
@@ -104,8 +105,7 @@ const cardItems = [
       description:
          'Top up CP for battle passes and cosmetics — competitive pricing and dependable delivery every time.',
       src: '/assets/cod.png'
-   },
-
+   }
 ]
 export type CardItemType = (typeof cardItems)[number]
 

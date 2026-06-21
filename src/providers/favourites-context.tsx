@@ -23,20 +23,17 @@ const FavoritesContext = createContext<FavoritesContextType>({
 });
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [favourites, setFavourites] = useState<string[]>([]);
-
-  // Load favourites on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("favourite");
-    if (stored) {
-      try {
-        setFavourites(JSON.parse(stored));
-      } catch (error) {
-        console.error("Error parsing favourites from localStorage:", error);
-        setFavourites([]);
+  const [favourites, setFavourites] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem("favourite");
+      if (stored) {
+        return JSON.parse(stored);
       }
+    } catch (error) {
+      console.error("Error parsing favourites from localStorage:", error);
     }
-  }, []);
+    return [];
+  });
 
   // Save favourites to localStorage
   useEffect(() => {

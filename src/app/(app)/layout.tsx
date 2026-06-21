@@ -8,7 +8,7 @@ import ToggleTheme from '@/components/shared/toggle-theme'
 import Footer from '@/components/shared/footer'
 // app/layout.tsx
 import { FavoritesProvider } from '@/providers/favourites-context'
-import { CartProvider } from '@/contexts/cart-context'
+import { CartProvider } from '@/providers/cart-context'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
    return (

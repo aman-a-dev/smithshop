@@ -68,7 +68,7 @@ export function ReportModal({
         <DialogHeader>
           <DialogTitle>Report product</DialogTitle>
           <DialogDescription>
-            Let us know what's wrong with "{productTitle}"
+            Let us know what&apos;s wrong with &quot;{productTitle}&quot;
           </DialogDescription>
         </DialogHeader>
         <div className='grid gap-4 py-2'>
