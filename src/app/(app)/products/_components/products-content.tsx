@@ -129,27 +129,19 @@ export default function ProductsContent() {
 
    return (
       <>
-         {/* --- modals --- */}
-         <InfoModal
-            open={!!infoProduct}
-            onOpenChange={(open: boolean) => !open && setInfoProduct(null)}
-            product={
-               infoProduct
-                  ? {
-                       ...infoProduct,
-                       currency: infoProduct.currency || 'ETB',
-                       originalPrice: undefined, // not needed for info
-                       rating: undefined
-                    }
-                  : {
-                       id: '',
-                       title: '',
-                       price: 0,
-                       currency: 'ETB',
-                       image: null
-                    }
-            }
-         />
+{/* --- modals --- */}
+{infoProduct && (
+  <InfoModal
+    open={true}
+    onOpenChange={(open: boolean) => !open && setInfoProduct(null)}
+    product={{
+      ...infoProduct,
+      currency: infoProduct.currency || 'ETB',
+      originalPrice: undefined,
+      rating: undefined,
+    }}
+  />
+)}
          <ReportModal
             open={!!reportProduct}
             onOpenChange={(open: boolean) => !open && setReportProduct(null)}

@@ -9,13 +9,13 @@ import { authClient } from '@/lib/auth-client'
 
 export default function AuthPage() {
    const handleTelegramLogin = async () => {
-      const { data, error } = await authClient.signIn.telegram({
-         callbackURL: '/dashboard'
-      })
-      if (error) {
-         toast.error(`An error occured ${error}`)
-      }
-   }
+  const { data, error } = await (authClient.signIn as any).telegram({
+    callbackURL: '/dashboard'
+  })
+  if (error) {
+    toast.error(`An error occured ${error}`)
+  }
+}
    const handleGoogleLogin = async () => {
       const { data, error } = await authClient.signIn.social({
          provider: 'google',
