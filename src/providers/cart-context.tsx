@@ -46,7 +46,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return []
    })
 
-   // Save to localStorage whenever cart changes
    useEffect(() => {
       localStorage.setItem('cart', JSON.stringify(items))
    }, [items])
@@ -111,8 +110,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             totalItems,
             totalPrice,
             isInCart
-         }}
-      >
+         }}>
          {children}
       </CartContext.Provider>
    )

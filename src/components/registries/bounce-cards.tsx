@@ -152,7 +152,7 @@ export function BounceCards({
                onMouseLeave={resetSiblings}
             >
                <Image
-                  className='w-full h-full object-cover'
+                  className='w-full h-auto object-cover'
                   src={src}
                   alt={`card-${idx}`}
                   width={100}

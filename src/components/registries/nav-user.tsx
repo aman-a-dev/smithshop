@@ -1,6 +1,12 @@
 'use client'
 
-import {LogIn, BadgeCheck, ChevronsUpDown, CreditCard, LogOut } from 'lucide-react'
+import {
+   LogIn,
+   BadgeCheck,
+   ChevronsUpDown,
+   CreditCard,
+   LogOut
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -21,7 +27,7 @@ import {
 } from '@/components/ui/sidebar'
 
 import { FallbackAvatar } from './fallback-avatar'
-import { signOut } from '@/lib/auth-client'
+import { authClient } from "@/lib/auth-client"
 
 export function NavUser({
    user
@@ -130,7 +136,7 @@ export function NavUser({
                            </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => signOut()}>
+                        <DropdownMenuItem onClick={() => authClient.signOut()}>
                            <LogOut />
                            Log out
                         </DropdownMenuItem>

@@ -1,11 +1,12 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
-  experimental: {
-    globalNotFound: true,
-  },
-};
+   /* config options here */
+   reactCompiler: true,
+   experimental: {
+      globalNotFound: true
+   },
+   //serverExternalPackages: ['grammy', 'fazercards']
+}
 
-export default nextConfig;
+export default nextConfig

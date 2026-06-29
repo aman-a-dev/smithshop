@@ -243,7 +243,7 @@ export function ProductCard({
          })
          setIsAdded(true)
          onAddToCart?.()
-         setTimeout(() => setIsAdded(false), 2000)
+         setIsAdded(false)
       })
    }
 

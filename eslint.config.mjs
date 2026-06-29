@@ -9,6 +9,7 @@ const eslintConfig = defineConfig([
    globalIgnores([
       // Default ignores of eslint-config-next:
       'src/components/registries/**',
+      'src/hooks/**',
       '.next/**',
       'out/**',
       'build/**',

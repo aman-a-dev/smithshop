@@ -12,6 +12,7 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import Logo from '@/components/shared/logo'
+import ToggleTheme from '@/components/shared/toggle-theme'
 
 type CardNavLink = {
    label: string
@@ -137,13 +138,15 @@ export default function CardNav({
       >
          {/* Top Bar */}
          <div className='h-[60px] px-6 flex items-center justify-between'>
-            <Link
-               href='/'
-               className='relative flex items-center h-8 w-28 shrink-0'
-            >
-               <Logo />
-            </Link>
+               <Link
+                  href='/'
+                  className='relative flex items-center h-8 w-28 shrink-0'
+               >
+                  <Logo />
+               </Link>
 
+            <div className='flex items-center justify-center'>
+               <ToggleTheme />
             <button
                onClick={toggleMenu}
                aria-expanded={isExpanded}
@@ -179,6 +182,7 @@ export default function CardNav({
                   />
                </div>
             </button>
+            </div>
          </div>
 
          {/* Collapsible Content */}

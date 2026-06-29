@@ -16,11 +16,12 @@ import {
    IconShoppingCartCopy,
    IconInfoSquare,
    IconAddressBook,
-   IconHeartPlus
+   IconHeartPlus,
+   IconBox
 } from '@tabler/icons-react'
 import { NavUser } from '@/components/registries/nav-user'
 import type { ElementType } from 'react'
-import { useSession } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client'
 import { hulkFont } from '@/fonts/font'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
@@ -53,6 +54,12 @@ const data: SidebarData = {
          icon: IconShoppingCartCopy
       },
       {
+         id: 'orders',
+         title: 'Orders',
+         url: '/orders',
+         icon: IconBox
+      },
+      {
          id: 'favorites',
          title: 'Favorites',
          url: '/favourites',
@@ -76,7 +83,7 @@ const data: SidebarData = {
 export default function AppSidebar({
    ...props
 }: React.ComponentProps<typeof Sidebar>) {
-   const { data: session } = useSession()
+   const { data: session } = authClient.useSession()
 
    const isLoggedIn = !!session?.user
    const user = {
@@ -113,13 +120,13 @@ export default function AppSidebar({
 function NavMain({ items }: { items: NavItem[] }) {
    const { toggleSidebar } = useSidebar()
    const isMobile = useIsMobile()
-   
+
    const handleSideBarItemClick = () => {
-     if(isMobile){
-       toggleSidebar()
-     }else{
-       return null
-     }
+      if (isMobile) {
+         toggleSidebar()
+      } else {
+         return null
+      }
    }
    return (
       <SidebarGroup>

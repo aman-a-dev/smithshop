@@ -1,5 +1,6 @@
 'use client'
 
+import type { Metadata } from 'next'
 import { useFavorites } from '@/providers/favourites-context'
 import { productsList } from '@/data/products-list'
 import { ProductCard } from '@/components/registries/product-card'
@@ -83,3 +84,10 @@ export default function FavouritesPage() {
       </main>
    )
 }
+
+// export const metadata: Metadata = {
+//   title: "Favourites | SmithShop",
+//   description:
+//     "Your saved products – game top‑ups, VPNs, and subscriptions you love.",
+//   keywords: ["favourites", "wishlist", "saved items", "game topup wishlist"],
+// };

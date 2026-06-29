@@ -1,0 +1,7 @@
+- auth error page
+- global not found
+- navbar computer responsible 
+- what admin Panel and actions 
+- fetch product while scrolling 
+- icon from tabular 
+- footer icon loop use tabular 
