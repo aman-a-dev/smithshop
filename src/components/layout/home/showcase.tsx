@@ -130,43 +130,45 @@ export default function ShowCase() {
    }, [])
 
    const ParallaxCardItem = ({
-      item,
-      id
-   }: {
-      item: CardItemType
-      id: number
-   }) => {
-      const targetScale = 1 - (cardItems.length - id) * 0.05
+  item,
+  id
+}: {
+  item: CardItemType
+  id: number
+}) => {
+  const targetScale = 1 - (cardItems.length - id) * 0.05
 
-      return (
-         <ParallaxCardEffect
-            id={id}
-            progress={scrollYProgress}
-            range={[id * 0.25, 1]}
-            targetScale={targetScale}
-            className={cn(
-               'relative flex flex-col rounded-xl px-14 py-8 shadow-2xl bg-background'
-            )}
-         >
-            <div className='space-y-4 text-center relative'>
-               <Image
-                  src={item.src}
-                  alt={item.title}
-                  width={100}
-                  height={100}
-                  className='absolute -top-28 mx-auto  rounded'
-               />
-               <h4 className='font-heading text-center text-3xl'>
-                  {item.title}
-               </h4>
-               <p className='text-balance opacity-80'>{item.description}</p>
-               <Button>
-                  Explore <ChevronRightIcon />
-               </Button>
-            </div>
-         </ParallaxCardEffect>
-      )
-   }
+  return (
+    <ParallaxCardEffect
+      id={id}
+      progress={scrollYProgress}
+      range={[id * 0.25, 1]}
+      targetScale={targetScale}
+      className={cn(
+        'relative flex flex-col rounded-xl px-14 py-8 shadow-2xl bg-background'
+      )}
+    >
+      <div className="space-y-4 text-center relative">
+        <Image
+          src={item.src}
+          alt={item.title}
+          width={0}
+          height={0}
+          sizes="100px"
+          style={{ width: '100px', height: '100px' }}
+          className="absolute -top-28 mx-auto rounded"
+          loading={id === 0 ? 'eager' : 'lazy'}
+          priority={id === 0}
+        />
+        <h4 className="font-heading text-center text-3xl">{item.title}</h4>
+        <p className="text-balance opacity-80">{item.description}</p>
+        <Button>
+          Explore <ChevronRightIcon />
+        </Button>
+      </div>
+    </ParallaxCardEffect>
+  )
+}
 
    return (
       <>

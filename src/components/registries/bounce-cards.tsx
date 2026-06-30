@@ -157,6 +157,9 @@ export function BounceCards({
                   alt={`card-${idx}`}
                   width={100}
                   height={100}
+                 loading="eager"
+  
+  priority
                />
             </div>
          ))}

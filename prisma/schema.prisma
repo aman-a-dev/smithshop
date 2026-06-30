@@ -44,7 +44,7 @@ model User {
   orders       Order[]
   payments     Payment[]
   transactions Transaction[]
-  carts        Cart[]
+  //carts        Cart[]
 
   @@map("user")
 }
@@ -155,15 +155,15 @@ model Package {
   @@map("package")
 }
 
-model Cart {
-  id           String            @id @default(cuid())
-  packageId    String
-  package      Package            @relation(fields: [userId], references: [id], onDelete: Restrict)
-  userId       String
-  user         User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+// model Cart {
+//   id           String            @id @default(cuid())
+//   packageId    String
+//   package      Package            @relation(fields: [userId], references: [id], onDelete: Restrict)
+//   userId       String
+//   user         User            @relation(fields: [userId], references: [id], onDelete: Restrict)
    
-  @@map("carts")
-}
+//   @@map("carts")
+// }
 
 // ============================================================
 // ORDERS

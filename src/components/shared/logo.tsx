@@ -1,31 +1,36 @@
-'use client'
+"use client";
 
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 
-import LightLogo from '../../../public/icons/smithshop-logo-light.svg'
-import DarkLogo from '../../../public/icons/smithshop-logo-dark.svg'
+import LightLogo from "../../../public/icons/smithshop-logo-light.svg";
+import DarkLogo from "../../../public/icons/smithshop-logo-dark.svg";
 
 export default function Logo() {
-   const { resolvedTheme } = useTheme()
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
 
-   // resolvedTheme is undefined on the server, so we render a placeholder
-   // to avoid hydration mismatch; once resolved, we show the image.
-   if (resolvedTheme === undefined) {
-      return <div style={{ width: 70, height: 100 }} aria-hidden="true" />
-   }
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
-   const isDark = resolvedTheme === 'dark'
-   const logoSrc = isDark ? LightLogo : DarkLogo
+    if (!mounted) {
+        return <div style={{ width: 70, height: 100 }} aria-hidden="true" />;
+    }
 
-   return (
-      <Image
-         src={logoSrc}
-         alt="Smithshop Logo"
-         width={70}
-         height={100}
-         className="h-auto"
-         priority
-      />
-   )
+    const isDark = resolvedTheme === "dark";
+    const logoSrc = isDark ? LightLogo : DarkLogo;
+
+    return (
+        <Image
+            src={logoSrc}
+            alt="Smithshop Logo"
+            width={0}
+            height={0}
+            sizes="70px"
+            style={{ width: "70px", height: "auto" }}
+            priority
+        />
+    );
 }
