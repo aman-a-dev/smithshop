@@ -1,6 +1,6 @@
 'use client'
 
-import type { Metadata } from 'next'
+
 import { useFavorites } from '@/providers/favourites-context'
 import { productsList } from '@/data/products-list'
 import { ProductCard } from '@/components/registries/product-card'
@@ -37,20 +37,19 @@ export default function FavouritesPage() {
    if (favouriteProducts.length === 0) {
       return (
          <Intro
-            heading='No favourites yet'
-            paragraph='Start adding products you love. They will appear here.'
-            badge='Favourites'
+            heading="No favourites yet"
+            paragraph="Start adding products you love. They will appear here."
+            badge="Favourites"
             icon={
                <HeartIcon
-                  className='h-16 w-16 text-muted-foreground/40'
+                  className="h-16 w-16 text-muted-foreground/40"
                   strokeWidth={1.5}
                />
             }
-            className='mt-30'
-         >
-            <div className='flex flex-col items-center gap-4'>
-               <Button className='mt-2'>
-                  <Link href='/products'>Browse products</Link>
+            className="mt-30">
+            <div className="flex flex-col items-center gap-4">
+               <Button className="mt-2">
+                  <Link href="/products">Browse products</Link>
                </Button>
             </div>
          </Intro>
@@ -58,19 +57,18 @@ export default function FavouritesPage() {
    }
 
    return (
-      <main className='container mx-auto px-4 py-8 mt-20'>
+      <main className="container mx-auto px-4 py-8 mt-20">
          <Intro
-            heading='Your favourites'
+            heading="Your favourites"
             paragraph="Your bookmarked products 🛍"
-            badge='Favourites'
-         >
-            <p className='text-muted-foreground mt-1'>
+            badge="Favourites">
+            <p className="text-muted-foreground mt-1">
                {favouriteProducts.length} item
                {favouriteProducts.length !== 1 && 's'}
             </p>
          </Intro>
 
-         <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {favouriteProducts.map(props => (
                <ProductCard
                   key={props.id}
@@ -84,10 +82,3 @@ export default function FavouritesPage() {
       </main>
    )
 }
-
-// export const metadata: Metadata = {
-//   title: "Favourites | SmithShop",
-//   description:
-//     "Your saved products – game top‑ups, VPNs, and subscriptions you love.",
-//   keywords: ["favourites", "wishlist", "saved items", "game topup wishlist"],
-// };

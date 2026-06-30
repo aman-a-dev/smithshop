@@ -1,5 +1,5 @@
 'use client'
-import type { Metadata } from 'next'
+
 import { useCart } from '@/providers/cart-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -194,11 +194,3 @@ export default function CartPage() {
       </main>
    )
 }
-
-
-// export const metadata: Metadata = {
-//   title: "Shopping Cart | SmithShop",
-//   description:
-//     "Review your selected game top‑ups, VPN plans, and subscriptions before checkout.",
-//   keywords: ["cart", "shopping cart", "game topup cart", "checkout"],
-// };

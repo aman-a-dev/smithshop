@@ -242,26 +242,26 @@ export async function createUser(
 }
 
 export async function updateUser(
-  id: number,
-  input: unknown
+   id: number,
+   input: unknown
 ): Promise<{ success: boolean; data?: User; error?: string }> {
-  const result = updateUserSchema.safeParse(input);
+   const result = updateUserSchema.safeParse(input)
 
-  if (!result.success) {
-    return {
-      success: false,
-      error: result.error.issues[0]?.message ?? "Invalid input",
-    };
-  }
+   if (!result.success) {
+      return {
+         success: false,
+         error: result.error.issues[0]?.message ?? 'Invalid input'
+      }
+   }
 
-  const index = demoUsers.findIndex((u) => u.id === id);
-  if (index === -1) return { success: false, error: "User not found" };
+   const index = demoUsers.findIndex(u => u.id === id)
+   if (index === -1) return { success: false, error: 'User not found' }
 
-  const updated = { ...demoUsers[index], ...result.data };
-  demoUsers[index] = updated;
+   const updated = { ...demoUsers[index], ...result.data }
+   demoUsers[index] = updated
 
-  revalidatePath("/admin/users");
-  return { success: true, data: updated };
+   revalidatePath('/admin/users')
+   return { success: true, data: updated }
 }
 
 export async function deleteUser(
@@ -297,6 +297,8 @@ export async function createProduct(
 ): Promise<{ success: boolean; data?: Product; error?: string }> {
    // Similar implementation with Zod schema...
    // For brevity, placeholder.
+   
+   
    return { success: false, error: 'Not implemented' }
 }
 
