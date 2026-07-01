@@ -2,370 +2,400 @@
 'use server'
 
 import { z } from 'zod'
+import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 
-// ---------- Types ----------
-export interface User {
-   id: number
-   name: string
-   email: string
-   status: 'Active' | 'Inactive' | 'Suspended'
-   joined: string
-}
+import prisma from '@/lib/prisma'          // adjust to your prisma client singleton path
+import { auth } from '@/lib/auth'              // adjust to your better-auth server instance path
+import type { Prisma, OrderStatus, PaymentStatus } from '@/generated/prisma' // adjust to your generator "output" path
 
-export interface Product {
-   id: string
-   name: string
-   price: string
-   stock: number
-   status: 'Active' | 'Out of Stock'
-}
+// ------------------------------------------------------------------
+// Types — derived, not hardcoded
+// ------------------------------------------------------------------
 
-export interface Order {
-   id: string
-   user: string
-   amount: string
-   status: 'Completed' | 'Pending' | 'Failed' | 'Processing'
-   date: string
-}
+// User shape comes from better-auth's own return type (it manages the
+// `user` table, including admin-plugin fields like role/banned).
+type AdminListUsersResult = Awaited<ReturnType<typeof auth.api.listUsers>>
+export type AdminUser = AdminListUsersResult['users'][number]
 
-export interface Transaction {
-   id: number
-   type: 'Deposit' | 'Withdrawal' | 'Payout'
-   amount: string
-   date: string
-   status: 'Completed' | 'Pending' | 'Failed'
-}
+// Everything else is a real Prisma model — use generated payload types
+// so shapes stay in sync with schema.prisma automatically.
+export type ProductWithRelations = Prisma.PackageGetPayload<{
+  include: { product: { include: { category: true } } }
+}>
+
+export type OrderWithRelations = Prisma.OrderGetPayload<{
+  include: {
+    user: { select: { id: true; name: true; email: true } }
+    items: { include: { package: true } }
+    payment: true
+  }
+}>
+
+export type TransactionWithRelations = Prisma.TransactionGetPayload<{
+  include: {
+    user: { select: { id: true; name: true; email: true } }
+    payment: true
+  }
+}>
 
 export interface DashboardStat {
-   title: string
-   value: number
-   change: string
-   url: string
+  title: string
+  value: number
+  change: string
+  url: string
 }
 
-// ---------- Demo Data ----------
-const demoUsers: User[] = [
-   {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      status: 'Active',
-      joined: '2026-06-01'
-   },
-   {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      status: 'Inactive',
-      joined: '2026-05-15'
-   },
-   {
-      id: 3,
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      status: 'Active',
-      joined: '2026-04-20'
-   },
-   {
-      id: 4,
-      name: 'Alice Brown',
-      email: 'alice@example.com',
-      status: 'Suspended',
-      joined: '2026-03-10'
-   }
-]
+type ActionResult<T> = { success: true; data: T } | { success: false; error: string }
 
-const demoProducts: Product[] = [
-   {
-      id: 'P001',
-      name: 'Top-Up $10',
-      price: '$10.00',
-      stock: 250,
-      status: 'Active'
-   },
-   {
-      id: 'P002',
-      name: 'Top-Up $20',
-      price: '$20.00',
-      stock: 180,
-      status: 'Active'
-   },
-   {
-      id: 'P003',
-      name: 'Top-Up $50',
-      price: '$50.00',
-      stock: 95,
-      status: 'Active'
-   },
-   {
-      id: 'P004',
-      name: 'Premium Pack',
-      price: '$100.00',
-      stock: 0,
-      status: 'Out of Stock'
-   }
-]
+function fail(error: unknown): ActionResult<never> {
+  return { success: false, error: error instanceof Error ? error.message : 'Unexpected error' }
+}
 
-const demoOrders: Order[] = [
-   {
-      id: '#1001',
-      user: 'John Doe',
-      amount: '$45.00',
-      status: 'Completed',
-      date: '2026-06-28'
-   },
-   {
-      id: '#1002',
-      user: 'Jane Smith',
-      amount: '$32.50',
-      status: 'Pending',
-      date: '2026-06-27'
-   },
-   {
-      id: '#1003',
-      user: 'Bob Johnson',
-      amount: '$67.80',
-      status: 'Failed',
-      date: '2026-06-27'
-   },
-   {
-      id: '#1004',
-      user: 'Alice Brown',
-      amount: '$21.20',
-      status: 'Completed',
-      date: '2026-06-26'
-   },
-   {
-      id: '#1005',
-      user: 'Charlie Wilson',
-      amount: '$54.90',
-      status: 'Processing',
-      date: '2026-06-25'
-   }
-]
+// ------------------------------------------------------------------
+// Zod schemas
+// ------------------------------------------------------------------
 
-const demoTransactions: Transaction[] = [
-   {
-      id: 1,
-      type: 'Deposit',
-      amount: '+$5,000',
-      date: '2026-06-28',
-      status: 'Completed'
-   },
-   {
-      id: 2,
-      type: 'Withdrawal',
-      amount: '-$2,300',
-      date: '2026-06-27',
-      status: 'Pending'
-   },
-   {
-      id: 3,
-      type: 'Deposit',
-      amount: '+$1,200',
-      date: '2026-06-26',
-      status: 'Completed'
-   },
-   {
-      id: 4,
-      type: 'Payout',
-      amount: '-$450',
-      date: '2026-06-25',
-      status: 'Failed'
-   }
-]
-
-// ---------- Zod Schemas ----------
 const createUserSchema = z.object({
-   name: z.string().min(1),
-   email: z.string().email(),
-   status: z.enum(['Active', 'Inactive', 'Suspended']).optional()
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(8),
+  role: z.union([z.string(), z.array(z.string())]).optional(),
 })
 
-const updateUserSchema = createUserSchema.partial()
+const updateUserSchema = z.object({
+  name: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+})
 
-// ---------- Server Actions ----------
+const banUserSchema = z.object({
+  userId: z.string(),
+  banReason: z.string().optional(),
+  banExpiresIn: z.number().int().positive().optional(), // seconds
+})
 
-// --- Users ---
-export async function getUsers(): Promise<{
-   success: boolean
-   data?: User[]
-   error?: string
-}> {
-   try {
-      // Simulate async DB call
-      await new Promise(resolve => setTimeout(resolve, 300))
-      return { success: true, data: demoUsers }
-   } catch (error: unknown) {
-      return { success: false, error: (error as Error).message }
-   }
+const createPackageSchema = z.object({
+  productId: z.string(),
+  label: z.string().min(1),
+  price: z.number().int().nonnegative(),
+  costPrice: z.number().int().nonnegative().optional(),
+  amount: z.number().int().optional(),
+  level: z.number().int().optional(),
+  diamonds: z.number().int().optional(),
+  membershipName: z.string().optional(),
+  duration: z.string().optional(),
+  isActive: z.boolean().optional(),
+})
+
+const updatePackageSchema = createPackageSchema.partial().extend({
+  id: z.string(),
+})
+
+const updateOrderStatusSchema = z.object({
+  id: z.string(),
+  status: z.enum([
+    'PENDING',
+    'AWAITING_PAYMENT',
+    'PROCESSING',
+    'COMPLETED',
+    'FAILED',
+    'CANCELLED',
+    'REFUNDED',
+  ]),
+})
+
+// ------------------------------------------------------------------
+// Users — via better-auth admin plugin (do not touch the table directly)
+// ------------------------------------------------------------------
+
+export async function getUsers(params?: {
+  limit?: number
+  offset?: number
+  searchValue?: string
+}): Promise<ActionResult<{ users: AdminUser[]; total: number }>> {
+  try {
+    const result = await auth.api.listUsers({
+      query: {
+        limit: params?.limit ?? 100,
+        offset: params?.offset ?? 0,
+        searchValue: params?.searchValue,
+        searchField: 'email',
+        searchOperator: 'contains',
+      },
+      headers: await headers(),
+    })
+    return { success: true, data: { users: result.users as AdminUser[], total: result.total } }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-export async function getUser(
-   id: number
-): Promise<{ success: boolean; data?: User; error?: string }> {
-   try {
-      const user = demoUsers.find(u => u.id === id)
-      if (!user) throw new Error('User not found')
-      return { success: true, data: user }
-   } catch (error: unknown) {
-      return { success: false, error: (error as Error).message }
-   }
+export async function getUser(id: string): Promise<ActionResult<AdminUser>> {
+  try {
+    const data = await auth.api.getUser({ query: { id }, headers: await headers() })
+    if (!data) throw new Error('User not found')
+    return { success: true, data: data as AdminUser }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-export async function createUser(
-   input: unknown
-): Promise<{ success: boolean; data?: User; error?: string }> {
-   const result = createUserSchema.safeParse(input)
+export async function createUser(input: unknown): Promise<ActionResult<AdminUser>> {
+  const parsed = createUserSchema.safeParse(input)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
 
-   if (!result.success) {
-      return {
-         success: false,
-         error: result.error.issues[0]?.message ?? 'Invalid input'
-      }
-   }
-
-   const parsed = result.data
-
-   const newUser: User = {
-      id: Math.max(0, ...demoUsers.map(u => u.id)) + 1,
-      name: parsed.name,
-      email: parsed.email,
-      status: parsed.status || 'Active',
-      joined: new Date().toISOString().slice(0, 10)
-   }
-
-   demoUsers.push(newUser)
-   revalidatePath('/admin/users')
-   return { success: true, data: newUser }
+  try {
+    const newUser = await auth.api.createUser({
+      body: {
+        email: parsed.data.email,
+        password: parsed.data.password,
+        name: parsed.data.name,
+        role: parsed.data.role ?? 'user',
+      },
+      headers: await headers(),
+    })
+    revalidatePath('/admin/users')
+    return { success: true, data: newUser as unknown as AdminUser }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-export async function updateUser(
-   id: number,
-   input: unknown
-): Promise<{ success: boolean; data?: User; error?: string }> {
-   const result = updateUserSchema.safeParse(input)
+export async function updateUser(userId: string, input: unknown): Promise<ActionResult<AdminUser>> {
+  const parsed = updateUserSchema.safeParse(input)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
 
-   if (!result.success) {
-      return {
-         success: false,
-         error: result.error.issues[0]?.message ?? 'Invalid input'
-      }
-   }
-
-   const index = demoUsers.findIndex(u => u.id === id)
-   if (index === -1) return { success: false, error: 'User not found' }
-
-   const updated = { ...demoUsers[index], ...result.data }
-   demoUsers[index] = updated
-
-   revalidatePath('/admin/users')
-   return { success: true, data: updated }
+  try {
+    const updated = await auth.api.adminUpdateUser({
+      body: { userId, data: parsed.data },
+      headers: await headers(),
+    })
+    revalidatePath('/admin/users')
+    return { success: true, data: updated as unknown as AdminUser }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-export async function deleteUser(
-   id: number
-): Promise<{ success: boolean; error?: string }> {
-   try {
-      const index = demoUsers.findIndex(u => u.id === id)
-      if (index === -1) throw new Error('User not found')
-      demoUsers.splice(index, 1)
-      revalidatePath('/admin/users')
-      return { success: true }
-   } catch (error: unknown) {
-      return { success: false, error: (error as Error).message }
-   }
+export async function banUser(input: unknown): Promise<ActionResult<null>> {
+  const parsed = banUserSchema.safeParse(input)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+
+  try {
+    await auth.api.banUser({ body: parsed.data, headers: await headers() })
+    revalidatePath('/admin/users')
+    return { success: true, data: null }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-// --- Products ---
-export async function getProducts(): Promise<{
-   success: boolean
-   data?: Product[]
-   error?: string
-}> {
-   try {
-      await new Promise(resolve => setTimeout(resolve, 300))
-      return { success: true, data: demoProducts }
-   } catch (error: unknown) {
-      return { success: false, error: (error as Error).message }
-   }
+export async function unbanUser(userId: string): Promise<ActionResult<null>> {
+  try {
+    await auth.api.unbanUser({ body: { userId }, headers: await headers() })
+    revalidatePath('/admin/users')
+    return { success: true, data: null }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-export async function createProduct(
-   input: unknown
-): Promise<{ success: boolean; data?: Product; error?: string }> {
-   // Similar implementation with Zod schema...
-   // For brevity, placeholder.
-   
-   
-   return { success: false, error: 'Not implemented' }
+export async function deleteUser(userId: string): Promise<ActionResult<null>> {
+  try {
+    await auth.api.removeUser({ body: { userId }, headers: await headers() })
+    revalidatePath('/admin/users')
+    return { success: true, data: null }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-// --- Orders ---
-export async function getOrders(): Promise<{
-   success: boolean
-   data?: Order[]
-   error?: string
-}> {
-   try {
-      await new Promise(resolve => setTimeout(resolve, 300))
-      return { success: true, data: demoOrders }
-   } catch (error: unknown) {
-      return { success: false, error: (error as Error).message }
-   }
+// ------------------------------------------------------------------
+// Products (Package model) — via Prisma
+// ------------------------------------------------------------------
+
+const productInclude = { product: { include: { category: true } } } as const
+
+// Used to populate the "Product" select when creating/editing a Package
+// in the admin UI (a Package always belongs to an existing Product).
+export type ProductOption = Prisma.ProductGetPayload<{ include: { category: true } }>
+
+export async function getProductOptions(): Promise<ActionResult<ProductOption[]>> {
+  try {
+    const data = await prisma.product.findMany({
+      include: { category: true },
+      orderBy: { name: 'asc' },
+    })
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-// --- Balance & Transactions ---
-export async function getBalance(): Promise<{
-   success: boolean
-   data?: { balance: number; transactions: Transaction[] }
-   error?: string
-}> {
-   try {
-      await new Promise(resolve => setTimeout(resolve, 300))
-      // For demo, balance is sum of completed deposits minus withdrawals/payouts
-      const balance = 0 // you can compute from transactions
-      return {
-         success: true,
-         data: { balance, transactions: demoTransactions }
-      }
-   } catch (error: unknown) {
-      return { success: false, error: (error as Error).message }
-   }
+export async function getProducts(): Promise<ActionResult<ProductWithRelations[]>> {
+  try {
+    const data = await prisma.package.findMany({
+      include: productInclude,
+      orderBy: { createdAt: 'desc' },
+    })
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
 }
 
-// --- Dashboard Stats ---
-export async function getDashboardStats(): Promise<{
-   success: boolean
-   data?: DashboardStat[]
-   error?: string
-}> {
-   try {
-      await new Promise(resolve => setTimeout(resolve, 300))
-      const stats: DashboardStat[] = [
-         { title: 'Balance', value: 24560, change: '+3%', url: '/balance' },
-         {
-            title: 'Total Users',
-            value: demoUsers.length,
-            change: '+12%',
-            url: '/users'
-         },
-         {
-            title: 'Products',
-            value: demoProducts.length,
-            change: '+5%',
-            url: '/products'
-         },
-         {
-            title: 'Orders',
-            value: demoOrders.length,
-            change: '+8%',
-            url: '/orders'
-         }
-      ]
-      return { success: true, data: stats }
-   } catch (error: unknown) {
-      return { success: false, error: (error as Error).message }
-   }
+export async function createProduct(input: unknown): Promise<ActionResult<ProductWithRelations>> {
+  const parsed = createPackageSchema.safeParse(input)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+
+  try {
+    const data = await prisma.package.create({
+      data: parsed.data,
+      include: productInclude,
+    })
+    revalidatePath('/admin/products')
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+export async function updateProduct(input: unknown): Promise<ActionResult<ProductWithRelations>> {
+  const parsed = updatePackageSchema.safeParse(input)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+
+  const { id, ...rest } = parsed.data
+  try {
+    const data = await prisma.package.update({
+      where: { id },
+      data: rest,
+      include: productInclude,
+    })
+    revalidatePath('/admin/products')
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+export async function deleteProduct(id: string): Promise<ActionResult<null>> {
+  try {
+    // Package has onDelete: Restrict from OrderItem — this will throw
+    // if the package is referenced by an existing order. Consider
+    // setting isActive: false instead of a hard delete in that case.
+    await prisma.package.delete({ where: { id } })
+    revalidatePath('/admin/products')
+    return { success: true, data: null }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+// ------------------------------------------------------------------
+// Orders — via Prisma
+// ------------------------------------------------------------------
+
+const orderInclude = {
+  user: { select: { id: true, name: true, email: true } },
+  items: { include: { package: true } },
+  payment: true,
+} as const
+
+export async function getOrders(): Promise<ActionResult<OrderWithRelations[]>> {
+  try {
+    const data = await prisma.order.findMany({
+      include: orderInclude,
+      orderBy: { createdAt: 'desc' },
+    })
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+export async function getOrder(id: string): Promise<ActionResult<OrderWithRelations>> {
+  try {
+    const data = await prisma.order.findUniqueOrThrow({ where: { id }, include: orderInclude })
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+export async function updateOrderStatus(input: unknown): Promise<ActionResult<OrderWithRelations>> {
+  const parsed = updateOrderStatusSchema.safeParse(input)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+
+  try {
+    const data = await prisma.order.update({
+      where: { id: parsed.data.id },
+      data: { status: parsed.data.status as OrderStatus },
+      include: orderInclude,
+    })
+    revalidatePath('/admin/orders')
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+// ------------------------------------------------------------------
+// Transactions & Balance — via Prisma
+// ------------------------------------------------------------------
+
+export async function getTransactions(): Promise<ActionResult<TransactionWithRelations[]>> {
+  try {
+    const data = await prisma.transaction.findMany({
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        payment: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    })
+    return { success: true, data }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+export async function getBalance(): Promise<ActionResult<{ balance: number; transactions: TransactionWithRelations[] }>> {
+  try {
+    const [{ _sum }, transactions] = await Promise.all([
+      prisma.transaction.aggregate({ _sum: { amount: true } }),
+      prisma.transaction.findMany({
+        include: { user: { select: { id: true, name: true, email: true } }, payment: true },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+      }),
+    ])
+    return { success: true, data: { balance: _sum.amount ?? 0, transactions } }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+// ------------------------------------------------------------------
+// Dashboard Stats — via Prisma
+// ------------------------------------------------------------------
+
+export async function getDashboardStats(): Promise<ActionResult<DashboardStat[]>> {
+  try {
+    const [userCount, productCount, orderCount, { _sum }] = await Promise.all([
+      prisma.user.count(),
+      prisma.package.count({ where: { isActive: true } }),
+      prisma.order.count(),
+      prisma.transaction.aggregate({ _sum: { amount: true } }),
+    ])
+
+    const stats: DashboardStat[] = [
+      { title: 'Balance', value: _sum.amount ?? 0, change: '', url: '/admin/balance' },
+      { title: 'Total Users', value: userCount, change: '', url: '/admin/users' },
+      { title: 'Products', value: productCount, change: '', url: '/admin/products' },
+      { title: 'Orders', value: orderCount, change: '', url: '/admin/orders' },
+    ]
+    return { success: true, data: stats }
+  } catch (e) {
+    return fail(e)
+  }
 }

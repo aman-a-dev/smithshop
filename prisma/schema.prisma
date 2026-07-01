@@ -44,7 +44,7 @@ model User {
   orders       Order[]
   payments     Payment[]
   transactions Transaction[]
-  //carts        Cart[]
+  carts        Cart[]
 
   @@map("user")
 }
@@ -122,7 +122,7 @@ model Product {
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
+  
   packages    Package[]
 
   @@unique([categoryId, type])
@@ -144,26 +144,33 @@ model Package {
   duration  String?  // for premium
 
   price     Int      // in ETB (smallest unit)
-  costPrice Int?     // <-- ADDED: optional cost price for margin tracking
+  
+
 
   isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
+  
   orderItems OrderItem[]
-
+  cartItems  Cart[]  
+  sku String @unique
+  
   @@map("package")
 }
 
-// model Cart {
-//   id           String            @id @default(cuid())
-//   packageId    String
-//   package      Package            @relation(fields: [userId], references: [id], onDelete: Restrict)
-//   userId       String
-//   user         User            @relation(fields: [userId], references: [id], onDelete: Restrict)
-   
-//   @@map("carts")
-// }
+model Cart {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  packageId String
+  package   Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+
+  quantity  Int     @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cart")
+}
 
 // ============================================================
 // ORDERS
@@ -281,5 +288,3 @@ model Transaction {
   @@index([userId])
   @@map("transaction")
 }
-
-

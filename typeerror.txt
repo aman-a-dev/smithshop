@@ -1,0 +1,31 @@
+src/action/admin.ts(10,57): error TS2307: Cannot find module '@/generated/prisma' or its corresponding type declarations.
+src/action/admin.ts(153,9): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'string | string[]' is not assignable to type '"admin" | "user" | ("admin" | "user")[] | undefined'.
+      Type 'string' is not assignable to type '"admin" | "user" | ("admin" | "user")[] | undefined'.
+src/action/admin.ts(253,7): error TS2322: Type '{ productId: string; label: string; price: number; costPrice?: number | undefined; amount?: number | undefined; level?: number | undefined; diamonds?: number | undefined; membershipName?: string | undefined; duration?: string | undefined; isActive?: boolean | undefined; }' is not assignable to type '(Without<PackageCreateInput, PackageUncheckedCreateInput> & PackageUncheckedCreateInput) | (Without<...> & PackageCreateInput)'.
+  Type '{ productId: string; label: string; price: number; costPrice?: number | undefined; amount?: number | undefined; level?: number | undefined; diamonds?: number | undefined; membershipName?: string | undefined; duration?: string | undefined; isActive?: boolean | undefined; }' is not assignable to type 'Without<PackageCreateInput, PackageUncheckedCreateInput> & PackageUncheckedCreateInput'.
+    Property 'sku' is missing in type '{ productId: string; label: string; price: number; costPrice?: number | undefined; amount?: number | undefined; level?: number | undefined; diamonds?: number | undefined; membershipName?: string | undefined; duration?: string | undefined; isActive?: boolean | undefined; }' but required in type 'PackageUncheckedCreateInput'.
+src/app/(admin)/admin/layout.tsx(25,21): error TS1308: 'await' expressions are only allowed within async functions and at the top levels of modules.
+src/app/(admin)/admin/layout.tsx(26,9): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'Promise<ReadonlyHeaders>' is not assignable to type 'HeadersInit'.
+      Type 'Promise<ReadonlyHeaders>' is not assignable to type 'Record<string, string>'.
+        Index signature for type 'string' is missing in type 'Promise<ReadonlyHeaders>'.
+src/app/(admin)/admin/orders/order-table.tsx(104,40): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/app/(admin)/admin/page.tsx(43,25): error TS2322: Type '{ children: Element; asChild: true; variant: "link"; className: string; }' is not assignable to type 'IntrinsicAttributes & ButtonProps & VariantProps<(props?: (ConfigVariants<{ variant: { default: string; outline: string; secondary: string; ghost: string; destructive: string; link: string; }; size: { ...; }; }> & ClassProp) | undefined) => string>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & ButtonProps & VariantProps<(props?: (ConfigVariants<{ variant: { default: string; outline: string; secondary: string; ghost: string; destructive: string; link: string; }; size: { ...; }; }> & ClassProp) | undefined) => string>'.
+src/app/(admin)/admin/products/product-table.tsx(175,26): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/app/(admin)/admin/products/product-table.tsx(194,58): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/app/(admin)/admin/products/product-table.tsx(333,44): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/app/(admin)/admin/products/product-table.tsx(343,47): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/app/(admin)/admin/users/user-table.tsx(113,26): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/app/(admin)/admin/users/user-table.tsx(192,46): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/app/(admin)/admin/users/user-table.tsx(210,49): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
