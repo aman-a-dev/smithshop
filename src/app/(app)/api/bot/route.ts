@@ -3,9 +3,7 @@ import { bot, initializeBot } from './index'
 
 export async function POST(req: NextRequest) {
   try {
-    // Ensure bot is initialized
     await initializeBot()
-
     const body = await req.text()
     const update = JSON.parse(body)
     await bot.handleUpdate(update)
@@ -15,6 +13,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid update' }, { status: 500 })
   }
 }
-
-export const dynamic = 'force-dynamic'
-export const fetchCache = 'force-no-store'

@@ -64,15 +64,159 @@ bot.command('help', helpCommand)
 bot.command('categories', categoriesCommand)
 bot.command('carts', cartsCommand)
 
-// ---------- Text & Callback Handlers ----------
-// ... (keep the rest of your handlers as they are)
+// ---------- Text Messages (target ID input) ----------
+bot.on('message:text', async (ctx) => {
+  const session = ctx.session
+  if (session.step === 'entering_target_id') {
+    await handleTargetIdInput(ctx)
+    return
+  }
+  if (session.step === 'checkout') {
+    await handleCheckout(ctx, ctx.message.text)
+    return
+  }
+})
+
+// ---------- Callback Queries ----------
+bot.on('callback_query:data', async (ctx) => {
+  const data = ctx.callbackQuery.data
+
+  if (data.startsWith('cat_')) {
+    await handleCategorySelection(ctx, data.replace('cat_', ''))
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data.startsWith('prod_')) {
+    await handleProductSelection(ctx, data.replace('prod_', ''))
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data.startsWith('pkg_')) {
+    await handlePackageSelection(ctx, data.replace('pkg_', ''))
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data.startsWith('addcart_')) {
+    await handleAddToCart(ctx, data.replace('addcart_', ''))
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data.startsWith('buynow_')) {
+    ctx.session.step = 'entering_target_id'
+    await ctx.reply('Please enter your Game ID / Account ID:')
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data.startsWith('removecart_')) {
+    await handleRemoveFromCart(ctx, data.replace('removecart_', ''))
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data === 'clear_cart') {
+    await handleClearCart(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data === 'checkout_cart') {
+    await handleCheckout(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data === 'confirm_order') {
+    await handleOrderConfirmation(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data === 'cancel_order') {
+    ctx.session.step = 'idle'
+    ctx.session.selectedCategoryId = undefined
+    ctx.session.selectedProductId = undefined
+    ctx.session.selectedPackageId = undefined
+    ctx.session.targetId = undefined
+    await ctx.reply('❌ Order cancelled. You can start again with /start')
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data === 'back_to_categories') {
+    await handleBackToCategories(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+  if (data === 'back_to_products') {
+    await handleBackToProducts(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+  if (data === 'back_to_menu') {
+    await handleBackToMenu(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data === 'products') {
+    await productsCommand(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+  if (data === 'orders') {
+    await ordersCommand(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+  if (data === 'categories') {
+    await categoriesCommand(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+  if (data === 'cart') {
+    await cartsCommand(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+  if (data === 'help') {
+    await helpCommand(ctx)
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data === 'contact_support') {
+    await ctx.reply(
+      '📞 <b>Contact Support</b>\n\n' +
+      'Our support team is available 24/7:\n' +
+      '• Telegram: @Smithdshop1\n' +
+      '• Response time: < 15 minutes',
+      { parse_mode: 'HTML' }
+    )
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  if (data.startsWith('order_status_')) {
+    const orderId = data.replace('order_status_', '')
+    await showOrderStatus(ctx, orderId)
+    await ctx.answerCallbackQuery()
+    return
+  }
+
+  await ctx.answerCallbackQuery()
+})
 
 // ---------- Error Handling ----------
 bot.catch((err) => {
   console.error('Bot error:', err)
 })
 
-// ---------- Lazy Initialization ----------
+// ---------- Lazy Initialization (for webhooks) ----------
 let initialized = false
 export async function initializeBot() {
   if (!initialized) {
@@ -94,5 +238,5 @@ export async function setBotCommands() {
   ])
 }
 
-// Auto-set commands when bot initializes (not required, but nice)
-// We'll call it from the route after init.
+// Auto-set commands when bot starts (only if we want it)
+// You can call setBotCommands() manually or inside initializeBot.
