@@ -40,7 +40,7 @@ export default async function AdminOverview() {
                 <div className="text-2xl font-bold">{displayValue}</div>
                 {/* No historical snapshot to diff against yet — omit the
                     fabricated "+X% from last month" line rather than fake it. */}
-                <Button asChild variant="link" className="mt-1 h-auto p-0">
+                <Button variant="link" className="mt-1 h-auto p-0">
                   <Link href={`/admin${stat.url}`}>Explore →</Link>
                 </Button>
               </CardContent>

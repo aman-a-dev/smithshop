@@ -49,7 +49,9 @@ export function OrderTable({ initialOrders }: { initialOrders: OrderWithRelation
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  function handleStatusChange(orderId: string, status: string) {
+  function handleStatusChange(orderId: string, status: string | null) {
+    if (!status) return
+
     startTransition(async () => {
       const result = await updateOrderStatus({ id: orderId, status })
       if (!result.success) {
@@ -92,48 +94,54 @@ export function OrderTable({ initialOrders }: { initialOrders: OrderWithRelation
                   </TableCell>
                 </TableRow>
               )}
-              {initialOrders.map(order => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id.slice(0, 8)}</TableCell>
-                  <TableCell>
-                    <div>{order.user.name}</div>
-                    <div className="text-xs text-muted-foreground">{order.user.email}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-0.5 text-sm">
-                      {order.items.map(item => (
-                        <div key={item.id}>
-                          {item.quantity}× {item.package.label}
-                        </div>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>{formatETB(order.totalAmount)}</TableCell>
-                  <TableCell>
-                    <Select
-                      value={order.status}
-                      onValueChange={v => handleStatusChange(order.id, v)}
-                      disabled={isPending}
-                    >
-                      <SelectTrigger className="w-[160px] h-8">
-                        <SelectValue>
-                          <Badge variant={STATUS_VARIANT[order.status] ?? 'outline'}>
-                            {order.status.replace('_', ' ')}
-                          </Badge>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STATUS_OPTIONS.map(s => (
-                          <SelectItem key={s} value={s}>
-                            {s.replace('_', ' ')}
-                          </SelectItem>
+              {initialOrders.map((order) => {
+                // ✅ Non-null assertion – `id` is always present in the schema
+                const orderId = order.id!
+                return (
+                  <TableRow key={orderId}>
+                    <TableCell className="font-medium">{orderId.slice(0, 8)}</TableCell>
+                    <TableCell>
+                      <div>{order.user.name}</div>
+                      <div className="text-xs text-muted-foreground">{order.user.email}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-0.5 text-sm">
+                        {order.items.map((item) => (
+                          <div key={item.id}>
+                            {item.quantity}× {item.package.label}
+                          </div>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>{formatDate(order.createdAt)}</TableCell>
-                </TableRow>
-              ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>{formatETB(order.totalAmount)}</TableCell>
+                    <TableCell>
+                      <Select
+                        value={order.status}
+                        onValueChange={(v) => {
+                          handleStatusChange(orderId, v)
+                        }}
+                        disabled={isPending}
+                      >
+                        <SelectTrigger className="w-[160px] h-8">
+                          <SelectValue>
+                            <Badge variant={STATUS_VARIANT[order.status] ?? 'outline'}>
+                              {order.status.replace('_', ' ')}
+                            </Badge>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STATUS_OPTIONS.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s.replace('_', ' ')}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>{formatDate(order.createdAt)}</TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </CardContent>

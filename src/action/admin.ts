@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 
 import prisma from '@/lib/prisma'          // adjust to your prisma client singleton path
 import { auth } from '@/lib/auth'              // adjust to your better-auth server instance path
-import type { Prisma, OrderStatus, PaymentStatus } from '@/generated/prisma' // adjust to your generator "output" path
+import type { Prisma, OrderStatus, PaymentStatus } from '@/generated/prisma/browser'
 
 // ------------------------------------------------------------------
 // Types — derived, not hardcoded
@@ -60,9 +60,11 @@ const createUserSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(8),
-  role: z.union([z.string(), z.array(z.string())]).optional(),
+  role: z.union([
+    z.enum(['admin', 'user']),
+    z.array(z.enum(['admin', 'user']))
+  ]).optional(),
 })
-
 const updateUserSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional(),
@@ -85,6 +87,7 @@ const createPackageSchema = z.object({
   membershipName: z.string().optional(),
   duration: z.string().optional(),
   isActive: z.boolean().optional(),
+  sku: z.string().optional(), // <-- add optional here
 })
 
 const updatePackageSchema = createPackageSchema.partial().extend({
@@ -249,10 +252,9 @@ export async function createProduct(input: unknown): Promise<ActionResult<Produc
   if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
 
   try {
-    const data = await prisma.package.create({
-      data: parsed.data,
-      include: productInclude,
-    })
+
+    const payload = { ...parsed.data, sku: parsed.data.sku ?? `pkg-${Date.now()}` }
+    const data = await prisma.package.create({ data: payload, include: productInclude })
     revalidatePath('/admin/products')
     return { success: true, data }
   } catch (e) {

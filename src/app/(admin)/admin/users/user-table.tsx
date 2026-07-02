@@ -35,7 +35,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import {
   DropdownMenu,
@@ -59,6 +58,7 @@ export function UserTable({ initialUsers, total }: { initialUsers: AdminUser[]; 
   const [isPending, startTransition] = useTransition()
   const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null)
 
   function handleCreate() {
     startTransition(async () => {
@@ -110,7 +110,7 @@ export function UserTable({ initialUsers, total }: { initialUsers: AdminUser[]; 
         </div>
 
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger>
             <Button>
               <UserPlus className="mr-2 h-4 w-4" />
               Add User
@@ -177,7 +177,7 @@ export function UserTable({ initialUsers, total }: { initialUsers: AdminUser[]; 
                   </TableCell>
                 </TableRow>
               )}
-              {initialUsers.map(user => {
+              {initialUsers.map((user) => {
                 const status = statusFor(user)
                 return (
                   <TableRow key={user.id}>
@@ -189,7 +189,7 @@ export function UserTable({ initialUsers, total }: { initialUsers: AdminUser[]; 
                     <TableCell>{formatDate(user.createdAt)}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger>
                           <Button variant="ghost" size="sm">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
@@ -206,28 +206,15 @@ export function UserTable({ initialUsers, total }: { initialUsers: AdminUser[]; 
                               </>
                             )}
                           </DropdownMenuItem>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem
-                                onSelect={e => e.preventDefault()}
-                                className="text-destructive focus:text-destructive"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete {user.name}?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This permanently removes the account and cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(user)}>Delete</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onSelect={(e) => {
+                              e.preventDefault()
+                              setUserToDelete(user)
+                            }}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -238,6 +225,22 @@ export function UserTable({ initialUsers, total }: { initialUsers: AdminUser[]; 
           </Table>
         </CardContent>
       </Card>
+
+      {/* Delete confirmation dialog - controlled by state */}
+      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {userToDelete?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes the account and cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setUserToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleDelete(userToDelete!)}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

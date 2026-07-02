@@ -1,0 +1,5 @@
+src/app/(app)/api/bot/commands/carts.ts(3,33): error TS2307: Cannot find module '../keyboards' or its corresponding type declarations.
+src/app/(app)/api/bot/commands/handlers.ts(4,72): error TS2307: Cannot find module '../keyboards' or its corresponding type declarations.
+src/app/(app)/api/bot/commands/products.ts(3,77): error TS2307: Cannot find module '../keyboards' or its corresponding type declarations.
+src/app/(app)/api/bot/commands/start.ts(2,33): error TS2307: Cannot find module '../keyboards' or its corresponding type declarations.
+src/app/(app)/api/bot/index.ts(24,33): error TS2307: Cannot find module './keyboards' or its corresponding type declarations.
