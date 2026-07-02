@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { bot } from './index'
+import { bot, initializeBot } from './index'
 
 export async function POST(req: NextRequest) {
   try {
+    // Ensure bot is initialized
+    await initializeBot()
+
     const body = await req.text()
     const update = JSON.parse(body)
     await bot.handleUpdate(update)
