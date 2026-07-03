@@ -2,35 +2,63 @@
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { JSX, SVGProps, useEffect } from 'react'
+import { JSX, SVGProps, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
+import { Loader2 } from 'lucide-react' // or any spinner icon
 
 export default function AuthPage() {
   const router = useRouter()
+  const [telegramLoading, setTelegramLoading] = useState(true)
+  const [telegramError, setTelegramError] = useState<string | null>(null)
 
   useEffect(() => {
-    authClient.initTelegramWidget(
-      'telegram-login-container',
-      { size: 'large', cornerRadius: 20 },
-      async (authData) => {
-        const { data, error } = await authClient.signInWithTelegram(authData)
+    let timeout: NodeJS.Timeout
 
-        if (error) {
-          toast.error(`An error occurred: ${error.message}`)
-          return
+    try {
+      // Initialize the Telegram widget
+      authClient.initTelegramWidget(
+        'telegram-login-container',
+        { size: 'large', cornerRadius: 20 },
+        async (authData) => {
+          // This callback runs when the user clicks the Telegram login button
+          setTelegramLoading(false) // not strictly necessary, but safe
+          const { data, error } = await authClient.signInWithTelegram(authData)
+
+          if (error) {
+            toast.error(`Authentication error: ${error.message}`)
+            setTelegramError(error.message || 'Authentication failed')
+            return
+          }
+
+          if (data) {
+            toast.success('Successfully authenticated')
+            const session = await authClient.getSession()
+            redirectByRole(session.data?.user?.role)
+          }
         }
+      )
 
-        if (data) {
-          toast.success('Successfully authenticated')
-
-          const session = await authClient.getSession()
-          redirectByRole(session.data?.user?.role)
+      // Give the widget up to 5 seconds to appear; if not, show a fallback
+      timeout = setTimeout(() => {
+        const container = document.getElementById('telegram-login-container')
+        // Check if the widget's iframe exists
+        const iframe = container?.querySelector('iframe')
+        if (!iframe) {
+          setTelegramError('Telegram widget failed to load. Please try again or use Google.')
+          setTelegramLoading(false)
+        } else {
+          setTelegramLoading(false)
         }
-      }
-    )
+      }, 5000)
+    } catch (err) {
+      setTelegramError((err as Error).message || 'Failed to initialize Telegram login')
+      setTelegramLoading(false)
+    }
+
+    return () => clearTimeout(timeout)
   }, [])
 
   const redirectByRole = (role?: string | null) => {
@@ -44,9 +72,6 @@ export default function AuthPage() {
   const handleGoogleLogin = async () => {
     const { data, error } = await authClient.signIn.social({
       provider: 'google',
-      // Route through a callback that checks role server-side,
-      // since better-auth handles this redirect itself —
-      // we never get `data` back in this component for OAuth.
       callbackURL: '/auth/callback',
       errorCallbackURL: '/error'
     })
@@ -67,16 +92,29 @@ export default function AuthPage() {
           </h2>
 
           <div className="mt-10 mb-3 relative">
-            <div id="telegram-login-container" className="flex justify-center" />
+            {/* Telegram widget container */}
+            <div id="telegram-login-container" className="flex justify-center min-h-[60px]">
+              {telegramLoading && (
+                <div className="flex items-center justify-center w-full">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+              {telegramError && (
+                <div className="text-sm text-destructive text-center w-full">
+                  {telegramError}
+                </div>
+              )}
+            </div>
             <Badge className="absolute -top-3 -right-2">
-              Recommended &#128165;
+              Recommended ⚡
             </Badge>
           </div>
 
           <Button
             variant="outline"
             className="inline-flex mb-10 w-full items-center justify-center space-x-2"
-            onClick={handleGoogleLogin}>
+            onClick={handleGoogleLogin}
+          >
             <GoogleIcon className="size-5" aria-hidden={true} />
             <span className="text-sm font-medium">Sign in with Google</span>
           </Button>
@@ -87,7 +125,7 @@ export default function AuthPage() {
               terms of service
             </Link>{' '}
             and{' '}
-            <Link href="/legal" className="underline underline-offset-4 font-black ont-[cursive]">
+            <Link href="/legal" className="underline underline-offset-4 font-black font-[cursive]">
               privacy policy
             </Link>
             .
