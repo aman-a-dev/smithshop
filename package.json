@@ -14,6 +14,7 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@tabler/icons-react": "^3.44.0",
+    "axios": "^1.18.1",
     "better-auth": "^1.6.18",
     "better-auth-telegram": "^1.5.0",
     "class-variance-authority": "^0.7.1",

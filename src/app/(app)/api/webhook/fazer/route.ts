@@ -1,58 +1,52 @@
+// app/api/webhook/fazer/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
+import prisma from '@/lib/prisma'
 
 export async function POST(req: NextRequest) {
-  // 1. Get the raw payload and headers
   const payload = await req.text()
-  const signature = req.headers.get('x-fazer-signature') // Use req.headers directly
+  const signature = req.headers.get('x-fazer-signature')
 
-  // 2. Validate the webhook signature
-  if (!isValidSignature(payload, signature)) {
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
-  }
-
-  // 3. Parse payload into JSON
-  const event = JSON.parse(payload)
-
-  // 4. Handle the specific FazerCards event
-  switch (event.type) {
-    case 'order.created':
-      console.log('Order received:', event.data.orderId)
-      break
-    case 'order.completed':
-      console.log('Order fulfilled:', event.data)
-      break
-    default:
-      console.log('Unhandled event type:', event.type)
-  }
-
-  // 5. Always return a 200 to acknowledge receipt
-  return NextResponse.json({ received: true }, { status: 200 })
-}
-
-function isValidSignature(payload: string, signature: string | null): boolean {
-  if (!signature) return false
-
+  // Verify signature
   const secret = process.env.FAZER_WEBHOOK_SECRET
   if (!secret) {
     console.error('Missing FAZER_WEBHOOK_SECRET')
-    return false
+    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
   }
 
-  try {
-    const expectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(payload, 'utf8')
-      .digest('hex') // adjust to 'base64' if Fazer uses that
-
-    const trustedBuffer = Buffer.from(expectedSignature, 'ascii')
-    const receivedBuffer = Buffer.from(signature, 'ascii')
-
-    if (trustedBuffer.length !== receivedBuffer.length) return false
-
-    return crypto.timingSafeEqual(trustedBuffer, receivedBuffer)
-  } catch (error) {
-    console.error('Signature verification error:', error)
-    return false
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload, 'utf8')
+    .digest('hex')
+  if (signature !== expected) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
+
+  const event = JSON.parse(payload)
+
+  // Handle event types as per FazerCards docs
+  if (event.type === 'order.completed') {
+    const { ref, status } = event.data // adjust to actual fields
+
+    // Find order by fulfilmentRef (set during Chapa webhook)
+    const order = await prisma.order.findFirst({
+      where: {
+        fulfilmentRef: ref,
+      },
+    })
+
+    if (order) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          status: 'COMPLETED',
+          fulfilmentRaw: event.data,
+        },
+      })
+    } else {
+      console.warn('Order not found for Fazer ref:', ref)
+    }
+  }
+
+  return NextResponse.json({ received: true })
 }

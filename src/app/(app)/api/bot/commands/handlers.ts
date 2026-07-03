@@ -1,7 +1,10 @@
+// app/api/bot/commands/handlers.ts
 import { BotContext } from '../index'
 import prisma from '@/lib/prisma'
 import { showProducts, showPackages } from './products'
 import { getPackageActionKeyboard, getOrderConfirmationKeyboard } from '@/app/(app)/api/bot/keyboard/keyboards'
+import { initializeChapaPayment } from '@/lib/chapa'
+import { placeFazerOrder } from '@/lib/fazer'
 
 // ---------- Category / Product / Package Selection ----------
 export async function handleCategorySelection(ctx: BotContext, categoryId: string) {
@@ -137,6 +140,7 @@ export async function handleCheckout(ctx: BotContext, targetId?: string) {
       }
     })
 
+    // Create order
     const order = await prisma.order.create({
       data: {
         userId: ctx.user.id,
@@ -149,7 +153,8 @@ export async function handleCheckout(ctx: BotContext, targetId?: string) {
       },
     })
 
-    await prisma.payment.create({
+    // Create payment
+    const payment = await prisma.payment.create({
       data: {
         orderId: order.id,
         userId: ctx.user.id,
@@ -161,6 +166,30 @@ export async function handleCheckout(ctx: BotContext, targetId?: string) {
     // Clear cart
     await prisma.cart.deleteMany({ where: { userId: ctx.user.id } })
 
+    // Get user email
+    const user = await prisma.user.findUnique({
+      where: { id: ctx.user.id },
+    })
+    const email = user?.email || `${ctx.from?.id}@telegram.user`
+
+    // Initialize Chapa
+    const { checkoutUrl, txRef } = await initializeChapaPayment(
+      payment.id,
+      total,
+      email,
+      ctx.from?.first_name || 'User'
+    )
+
+    // Update payment with Chapa details
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: {
+        checkoutUrl,
+        providerRef: txRef,
+      },
+    })
+
+    // Clear session
     ctx.session.step = 'idle'
     ctx.session.targetId = undefined
 
@@ -172,9 +201,11 @@ export async function handleCheckout(ctx: BotContext, targetId?: string) {
 🎯 <b>Target ID:</b> ${targetId}
 
 <b>📌 Next Steps:</b>
-1. Click the payment link below (coming soon)
+1. Click the payment link below
 2. Complete payment via Chapa
 3. Wait for confirmation (5-30 mins)
+
+<a href="${checkoutUrl}">💳 Complete Payment</a>
 
 You can check your order status anytime with /orders
 
@@ -185,7 +216,6 @@ You can check your order status anytime with /orders
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
-          // [{ text: '💳 Complete Payment', url: checkoutUrl }],
           [{ text: '📊 Check Status', callback_data: `order_status_${order.id}` }],
           [{ text: '🏠 Back to Menu', callback_data: 'back_to_menu' }],
         ],
@@ -235,6 +265,7 @@ export async function handleOrderConfirmation(ctx: BotContext) {
       return
     }
 
+    // Create order
     const order = await prisma.order.create({
       data: {
         userId: ctx.user.id,
@@ -252,7 +283,8 @@ export async function handleOrderConfirmation(ctx: BotContext) {
       },
     })
 
-    await prisma.payment.create({
+    // Create payment
+    const payment = await prisma.payment.create({
       data: {
         orderId: order.id,
         userId: ctx.user.id,
@@ -261,6 +293,30 @@ export async function handleOrderConfirmation(ctx: BotContext) {
       },
     })
 
+    // Get user email
+    const user = await prisma.user.findUnique({
+      where: { id: ctx.user.id },
+    })
+    const email = user?.email || `${ctx.from?.id}@telegram.user`
+
+    // Initialize Chapa
+    const { checkoutUrl, txRef } = await initializeChapaPayment(
+      payment.id,
+      pkg.price,
+      email,
+      ctx.from?.first_name || 'User'
+    )
+
+    // Update payment with Chapa details
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: {
+        checkoutUrl,
+        providerRef: txRef,
+      },
+    })
+
+    // Clear session
     ctx.session.step = 'idle'
     ctx.session.selectedPackageId = undefined
     ctx.session.targetId = undefined
@@ -277,14 +333,17 @@ export async function handleOrderConfirmation(ctx: BotContext) {
 2. Complete payment via Chapa
 3. Wait for confirmation (5-30 mins)
 
+<a href="${checkoutUrl}">💳 Complete Payment</a>
+
 You can check your order status anytime with /orders
+
+⚠️ <i>Note: Your order will be cancelled if payment is not completed within 30 minutes.</i>
     `
 
     await ctx.reply(msg, {
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
-          // [{ text: '💳 Complete Payment', url: checkoutUrl }],
           [{ text: '📊 Check Status', callback_data: `order_status_${order.id}` }],
           [{ text: '🏠 Back to Menu', callback_data: 'back_to_menu' }],
         ],

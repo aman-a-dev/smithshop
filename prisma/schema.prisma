@@ -159,16 +159,18 @@ model Package {
 }
 
 model Cart {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   packageId String
-  package   Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  package   Package  @relation(fields: [packageId], references: [id], onDelete: Restrict)
 
-  quantity  Int     @default(1)
+  quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([userId, packageId])
+  @@index([userId])
   @@map("cart")
 }
 

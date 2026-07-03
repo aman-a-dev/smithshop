@@ -1,100 +1,307 @@
-'use client'
+"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { toast } from 'sonner'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 export interface CartItem {
-  id: string
-  title: string
-  price: number
-  image: string
-  currency: string
-  quantity: number
-  subtitle?: string
-  type?: string
+  id: string; // packageId, same identity in guest + DB carts
+  packageId: string;
+  title: string;
+  price: number;
+  image: string;
+  currency: string;
+  quantity: number;
+  subtitle?: string;
+  type?: string;
 }
+
+type AddItemInput = Omit<CartItem, "quantity"> & { quantity?: number };
 
 interface CartContextType {
-  items: CartItem[]
-  addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
-  clearCart: () => void
-  totalItems: number
-  totalPrice: number
-  isInCart: (id: string) => boolean
+  items: CartItem[];
+  addItem: (item: AddItemInput) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+  totalItems: number;
+  totalPrice: number;
+  isInCart: (id: string) => boolean;
+  isAuthenticated: boolean;
+  isSyncing: boolean;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined)
+const CartContext = createContext<CartContextType | undefined>(undefined);
+const GUEST_CART_KEY = "guest-cart-v1";
+
+function normalizeItem(item: Partial<CartItem> & { id?: string; packageId?: string }, quantity = 1): CartItem {
+  const packageId = item.packageId ?? item.id ?? "";
+  return {
+    id: packageId,
+    packageId,
+    title: item.title ?? "",
+    price: item.price ?? 0,
+    image: item.image ?? "/placeholder.png",
+    currency: item.currency ?? "ETB",
+    quantity,
+    subtitle: item.subtitle,
+    type: item.type,
+  };
+}
+
+function upsertLocal(items: CartItem[], incoming: CartItem, mergeQty = true) {
+  const existing = items.find((x) => x.id === incoming.id);
+  if (!existing) return [...items, incoming];
+
+  return items.map((x) =>
+    x.id === incoming.id
+      ? {
+        ...x,
+        quantity: mergeQty ? x.quantity + incoming.quantity : incoming.quantity,
+        title: incoming.title || x.title,
+        price: incoming.price || x.price,
+        image: incoming.image || x.image,
+        currency: incoming.currency || x.currency,
+        subtitle: incoming.subtitle ?? x.subtitle,
+        type: incoming.type ?? x.type,
+      }
+      : x
+  );
+}
+
+async function apiGetCart(): Promise<CartItem[]> {
+  const res = await fetch("/api/cart", { method: "GET" });
+  if (!res.ok) throw new Error("Failed to load cart");
+  const data = await res.json();
+  return data.items as CartItem[];
+}
+
+async function apiUpsertItem(item: AddItemInput): Promise<CartItem[]> {
+  const res = await fetch("/api/cart", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "upsert",
+      item: normalizeItem(item, item.quantity ?? 1),
+    }),
+  });
+  if (!res.ok) throw new Error("Failed to update cart");
+  const data = await res.json();
+  return data.items as CartItem[];
+}
+
+async function apiSetQuantity(packageId: string, quantity: number): Promise<CartItem[]> {
+  const res = await fetch("/api/cart", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ packageId, quantity }),
+  });
+  if (!res.ok) throw new Error("Failed to update quantity");
+  const data = await res.json();
+  return data.items as CartItem[];
+}
+
+async function apiRemoveItem(packageId: string): Promise<CartItem[]> {
+  const res = await fetch("/api/cart", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ packageId }),
+  });
+  if (!res.ok) throw new Error("Failed to remove item");
+  const data = await res.json();
+  return data.items as CartItem[];
+}
+
+async function apiClearCart(): Promise<CartItem[]> {
+  const res = await fetch("/api/cart", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+  if (!res.ok) throw new Error("Failed to clear cart");
+  const data = await res.json();
+  return data.items as CartItem[];
+}
+
+async function apiMergeGuestCart(items: CartItem[]): Promise<CartItem[]> {
+  const res = await fetch("/api/cart", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "merge",
+      items,
+    }),
+  });
+  if (!res.ok) throw new Error("Failed to merge guest cart");
+  const data = await res.json();
+  return data.items as CartItem[];
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([])
+  const { data: session, isPending: sessionLoading } = authClient.useSession();
+  const isAuthenticated = !!session?.user?.id;
 
-  // Load from localStorage after mount
+  const [hydrated, setHydrated] = useState(false);
+  const [guestItems, setGuestItems] = useState<CartItem[]>([]);
+  const [serverItems, setServerItems] = useState<CartItem[]>([]);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const guestRef = useRef<CartItem[]>([]);
+  const serverRef = useRef<CartItem[]>([]);
+  const prevUserIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('cart')
+      const saved = localStorage.getItem(GUEST_CART_KEY);
       if (saved) {
-        setItems(JSON.parse(saved))
+        const parsed = JSON.parse(saved) as CartItem[];
+        setGuestItems(Array.isArray(parsed) ? parsed : []);
       }
-    } catch (e) {
-      console.log(e)
+    } catch {
+      setGuestItems([]);
+    } finally {
+      setHydrated(true);
     }
-  }, [])
+  }, []);
 
-  // Persist changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items))
-  }, [items])
-
-  const addItem = (
-    newItem: Omit<CartItem, 'quantity'> & { quantity?: number }
-  ) => {
-    setItems(prev => {
-      const existing = prev.find(item => item.id === newItem.id)
-      if (existing) {
-        toast.success(`Increased ${newItem.title} quantity`)
-        return prev.map(item =>
-          item.id === newItem.id
-            ? {
-                ...item,
-                quantity: item.quantity + (newItem.quantity || 1),
-              }
-            : item
-        )
-      }
-      toast.success(`Added ${newItem.title} to cart`)
-      return [...prev, { ...newItem, quantity: newItem.quantity || 1 }]
-    })
-  }
-
-  const removeItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id))
-    toast.info('Item removed from cart')
-  }
-
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(id)
-      return
+    guestRef.current = guestItems;
+    if (hydrated && !isAuthenticated) {
+      localStorage.setItem(GUEST_CART_KEY, JSON.stringify(guestItems));
     }
-    setItems(prev =>
-      prev.map(item => (item.id === id ? { ...item, quantity } : item))
-    )
-  }
+  }, [guestItems, hydrated, isAuthenticated]);
 
-  const clearCart = () => {
-    setItems([])
-    toast.info('Cart cleared')
-  }
+  useEffect(() => {
+    serverRef.current = serverItems;
+  }, [serverItems]);
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  )
+  useEffect(() => {
+    if (!hydrated || sessionLoading) return;
 
-  const isInCart = (id: string) => items.some(item => item.id === id)
+    const currentUserId = session?.user?.id ?? null;
+    const previousUserId = prevUserIdRef.current;
+
+    const userChanged = previousUserId !== currentUserId;
+    if (!userChanged) return;
+
+    const run = async () => {
+      setIsSyncing(true);
+      try {
+        if (currentUserId) {
+          const guestSnapshot = guestRef.current;
+
+          if (guestSnapshot.length) {
+            const merged = await apiMergeGuestCart(guestSnapshot);
+            setServerItems(merged);
+            setGuestItems([]);
+            localStorage.removeItem(GUEST_CART_KEY);
+          } else {
+            const fresh = await apiGetCart();
+            setServerItems(fresh);
+          }
+        } else {
+          if (previousUserId) {
+            const currentServerCart = serverRef.current;
+            setGuestItems(currentServerCart);
+            localStorage.setItem(GUEST_CART_KEY, JSON.stringify(currentServerCart));
+          }
+          setServerItems([]);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsSyncing(false);
+        prevUserIdRef.current = currentUserId;
+      }
+    };
+
+    run();
+  }, [hydrated, sessionLoading, session?.user?.id]);
+
+  const items = isAuthenticated ? serverItems : guestItems;
+
+  const refreshServerCart = async () => {
+    const fresh = await apiGetCart();
+    setServerItems(fresh);
+    return fresh;
+  };
+
+  const addItem = async (item: AddItemInput) => {
+    const quantity = item.quantity ?? 1;
+
+    if (isAuthenticated) {
+      const updated = await apiUpsertItem({ ...item, quantity });
+      setServerItems(updated);
+      toast.success(`Added ${item.title} to cart`);
+      return;
+    }
+
+    const normalized = normalizeItem(item, quantity);
+    setGuestItems((prev) => upsertLocal(prev, normalized, true));
+    toast.success(`Added ${item.title} to cart`);
+  };
+
+  const removeItem = async (id: string) => {
+    if (isAuthenticated) {
+      const updated = await apiRemoveItem(id);
+      setServerItems(updated);
+      toast.info("Item removed from cart");
+      return;
+    }
+
+    setGuestItems((prev) => prev.filter((item) => item.id !== id));
+    toast.info("Item removed from cart");
+  };
+
+  const updateQuantity = async (id: string, quantity: number) => {
+    if (quantity <= 0) {
+      await removeItem(id);
+      return;
+    }
+
+    if (isAuthenticated) {
+      const updated = await apiSetQuantity(id, quantity);
+      setServerItems(updated);
+      return;
+    }
+
+    setGuestItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+    );
+  };
+
+  const clearCart = async () => {
+    if (isAuthenticated) {
+      const updated = await apiClearCart();
+      setServerItems(updated);
+      toast.info("Cart cleared");
+      return;
+    }
+
+    setGuestItems([]);
+    localStorage.removeItem(GUEST_CART_KEY);
+    toast.info("Cart cleared");
+  };
+
+  const totalItems = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items]
+  );
+
+  const totalPrice = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items]
+  );
+
+  const isInCart = (id: string) => items.some((item) => item.id === id);
 
   return (
     <CartContext.Provider
@@ -107,15 +314,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalItems,
         totalPrice,
         isInCart,
+        isAuthenticated,
+        isSyncing,
       }}
     >
       {children}
     </CartContext.Provider>
-  )
+  );
 }
 
 export function useCart() {
-  const context = useContext(CartContext)
-  if (!context) throw new Error('useCart must be used within a CartProvider')
-  return context
+  const context = useContext(CartContext);
+  if (!context) throw new Error("useCart must be used within a CartProvider");
+  return context;
 }

@@ -234,6 +234,7 @@ export function ProductCard({
     startTransition(() => {
       addItem({
         id,
+        packageId: id,          // ✅ added
         title,
         price,
         image,
@@ -253,6 +254,7 @@ export function ProductCard({
       if (!alreadyInCart) {
         addItem({
           id,
+          packageId: id,        // ✅ added
           title,
           price,
           image,
