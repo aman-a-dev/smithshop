@@ -3,8 +3,16 @@
 An elegant marketplace web application for gaming and social media assets built on top of **Next.js**.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-98.8%25-3178C6?style=flat-square&logo=typescript)](/)
+<<<<<<< HEAD
 [![CSS](https://img.shields.io/badge/CSS-1.1%25-563D7C?style=flat-square&logo=css3)](/)
 [![Next.js](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
+=======
+[![Tailwindcss](https://img.shields.io/badge/CSS-1.1%25-563D7C?style=flat-square&logo=css3)](/)
+[![Next.js](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
+[![PrismaORM](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
+[![Better-Auth](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
+[![Shadcn](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
+>>>>>>> 6b8a064 (add legal page)
 
 ---
 
@@ -32,8 +40,12 @@ An elegant marketplace web application for gaming and social media assets built 
 - ⚡ **Fast Performance** - Server-side rendering and static generation with Next.js
 - 📱 **Responsive Design** - Mobile-first, fully responsive interface
 - 🔍 **Advanced Search** - Filter and search through marketplace items
+<<<<<<< HEAD
 - ⭐ **Ratings & Reviews** - Community feedback and ratings system
 
+=======
+- 🔍 **Admin Panel** - For user and product management
+>>>>>>> 6b8a064 (add legal page)
 ---
 
 ## 🛠️ Tech Stack
@@ -41,6 +53,7 @@ An elegant marketplace web application for gaming and social media assets built 
 ### Frontend
 - **Next.js** - React framework for production
 - **TypeScript** - Type-safe JavaScript development
+<<<<<<< HEAD
 - **CSS** - Styling and responsive design
 
 ### Key Technologies
@@ -48,6 +61,10 @@ An elegant marketplace web application for gaming and social media assets built 
 - Server-side Rendering (SSR)
 - Static Site Generation (SSG)
 - API Routes
+=======
+- **Tailwindcss** - Styling and responsive design
+- **Shadcn/UI** - Base UL styled components
+>>>>>>> 6b8a064 (add legal page)
 
 ---
 
@@ -79,7 +96,11 @@ Before you begin, ensure you have the following installed:
 
 3. **Set up environment variables:**
    ```bash
+<<<<<<< HEAD
    cp .env.example .env.local
+=======
+   cp .env
+>>>>>>> 6b8a064 (add legal page)
    ```
    Fill in the required environment variables in `.env.local`.
 
@@ -92,8 +113,11 @@ Before you begin, ensure you have the following installed:
 Start the development server:
 ```bash
 npm run dev
+<<<<<<< HEAD
 # or
 yarn dev
+=======
+>>>>>>> 6b8a064 (add legal page)
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
@@ -108,6 +132,7 @@ The application will automatically reload when you make changes to the code.
 
 ```
 smithshop/
+<<<<<<< HEAD
 ├── pages/              # Next.js pages and API routes
 ├── components/         # Reusable React components
 ├── styles/            # Global and module styles
@@ -116,6 +141,14 @@ smithshop/
 ├── types/             # TypeScript type definitions
 ├── .env.local         # Environment variables (local)
 └── package.json       # Project dependencies
+=======
+├── components/         # Reusable React components
+├── data/               # products data
+├── public/             # Static assets
+├── lib/                # Utility functions and helpers
+├── .env.               # Environment variables (local)
+└── package.json        # Project dependencies
+>>>>>>> 6b8a064 (add legal page)
 ```
 
 ### Code Style
@@ -129,15 +162,21 @@ This project uses TypeScript for type safety and follows modern React best pract
 Build the application for production:
 ```bash
 npm run build
+<<<<<<< HEAD
 # or
 yarn build
+=======
+>>>>>>> 6b8a064 (add legal page)
 ```
 
 Start the production server:
 ```bash
 npm start
+<<<<<<< HEAD
 # or
 yarn start
+=======
+>>>>>>> 6b8a064 (add legal page)
 ```
 
 ---
@@ -173,7 +212,12 @@ For questions, suggestions, or support, please open an issue on the [GitHub repo
 - [ ] Advanced filtering and sorting
 - [ ] Payment gateway integration
 - [ ] User dashboard
+<<<<<<< HEAD
 - [ ] Wishlist functionality
+=======
+- [ ] Admin dashboard
+- [ ] Favourites functionality
+>>>>>>> 6b8a064 (add legal page)
 - [ ] Reviews and ratings system
 - [ ] Seller dashboard
 

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Mail, MapPin, Phone, Clock, Send, HelpCircle } from 'lucide-react'
+import { Mail, Phone, Clock, Send, HelpCircle } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ContactForm } from './contact-form'   // ✅ imports the new form
 
@@ -15,29 +15,6 @@ export const metadata: Metadata = {
     'customer service',
     'smithshop contact',
   ],
-  openGraph: {
-    title: 'Contact Us | SmithShop',
-    description:
-      'Reach SmithShop support for help with orders, top‑ups, or account issues. We reply within 24 hours.',
-    url: 'https://smithshop.com/contact',
-    siteName: 'SmithShop',
-    images: [
-      {
-        url: 'https://smithshop.com/og-contact.jpg',
-        width: 1200,
-        height: 630,
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Contact Us | SmithShop',
-    description:
-      'Reach SmithShop support for help with orders, top‑ups, or account issues. We reply within 24 hours.',
-    images: ['https://smithshop.com/og-contact.jpg'],
-  },
 }
 
 const contactInfo = [
@@ -51,22 +28,15 @@ const contactInfo = [
   {
     icon: Phone,
     label: 'Phone',
-    value: '+1 (555) 123-4567',
-    link: 'tel:+15551234567',
+    value: '+251968783613',
+    link: 'tel:+251968783613',
     description: 'Mon–Fri, 9 AM – 6 PM EST',
-  },
-  {
-    icon: MapPin,
-    label: 'Address',
-    value: '123 Digital Street, Suite 100',
-    link: '#',
-    description: 'New York, NY 10001, USA',
   },
   {
     icon: Clock,
     label: 'Support Hours',
     value: '24/7 Live Chat',
-    link: '#',
+    link: 'https://t.me/Ethiosmith',
     description: 'Available for urgent inquiries',
   },
 ]
@@ -80,7 +50,7 @@ const faqs = [
   {
     question: 'What payment methods do you accept?',
     answer:
-      'We accept credit/debit cards (Visa, Mastercard, Amex), PayPal, and various cryptocurrencies.',
+      'We accept Chapa payment (telebirr,  cbe ...).',
   },
   {
     question: 'Is my personal information secure?',
@@ -197,9 +167,7 @@ export default function ContactPage() {
                   </p>
                   <button
                     className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-                    onClick={() =>
-                      alert('Live chat would open here.')
-                    }
+
                   >
                     <Send className="size-4" />
                     Start Live Chat
@@ -210,33 +178,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-
-      {/* ===== MAP PLACEHOLDER ===== */}
-      <section className="border-t bg-muted/30 py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="overflow-hidden rounded-xl border bg-background shadow-sm">
-            <div className="flex h-64 items-center justify-center bg-muted/50 text-muted-foreground">
-              <div className="text-center">
-                <MapPin className="mx-auto size-8 text-primary" />
-                <p className="mt-2 font-medium">Find Us Here</p>
-                <p className="text-sm">123 Digital Street, New York, NY</p>
-                <p className="mt-2 text-xs">
-                  (Interactive map would be embedded here)
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== FOOTER ===== */}
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <div className="container mx-auto px-4">
-          <p>
-            &copy; {new Date().getFullYear()} SmithShop. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }

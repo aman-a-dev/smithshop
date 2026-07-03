@@ -2,18 +2,16 @@
 
 import { useState } from 'react'
 import { Send } from 'lucide-react'
-
-// Import your field components (adjust paths to match your project)
 import {
   Field,
   FieldLabel,
   FieldError,
   FieldGroup,
-} from '@/components/ui/field'   // or from '@base-ui/react' etc.
-
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { toast } from "sonner"
 
 export function ContactForm() {
   const [name, setName] = useState('')
@@ -49,7 +47,7 @@ export function ContactForm() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500))
     console.log({ name, email, subject, message })
-    alert('Thank you for your message! We will get back to you soon.')
+    toast.success('Thank you for your message! We will get back to you soon.')
 
     // Reset form
     setName('')

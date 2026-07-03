@@ -32,29 +32,6 @@ export const metadata: Metadata = {
     'vpn subscriptions',
     'game credits',
   ],
-  openGraph: {
-    title: 'About Us | SmithShop',
-    description:
-      'Learn about SmithShop – your trusted store for game credits, VPNs, and digital subscriptions since 2020.',
-    url: 'https://smithshop.com/about',
-    siteName: 'SmithShop',
-    images: [
-      {
-        url: 'https://smithshop.com/og-about.jpg',
-        width: 1200,
-        height: 630,
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'About Us | SmithShop',
-    description:
-      'Learn about SmithShop – your trusted store for game credits, VPNs, and digital subscriptions since 2020.',
-    images: ['https://smithshop.com/og-about.jpg'],
-  },
 }
 
 const stats = [
@@ -110,7 +87,7 @@ export default function AboutPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* ===== HERO SECTION ===== */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary/10 via-background to-background py-24 md:py-32">
+      <section className="relative overflow-hidden bg-gradient-to-b  from-background via-background to-primary/10  py-24 md:py-32">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
         <div className="container mx-auto px-4 md:px-6">
           <div className="mx-auto max-w-4xl text-center">
@@ -266,72 +243,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ===== TIMELINE SECTION ===== */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold tracking-tight md:text-4xl">
-              Our Journey
-            </h2>
-            <p className="mx-auto max-w-2xl text-muted-foreground">
-              From a small idea to a global digital store — here are our key
-              milestones.
-            </p>
-            <Separator className="mx-auto mt-4 w-24" />
-          </div>
-          <div className="relative">
-            {/* Timeline line - hidden on mobile, shown on md+ */}
-            <div className="absolute left-1/2 top-0 hidden h-full w-0.5 -translate-x-1/2 bg-primary/20 md:block" />
-
-            <div className="flex flex-col gap-8 md:gap-12">
-              {milestones.map((milestone, index) => {
-                const isEven = index % 2 === 0
-                return (
-                  <div
-                    key={index}
-                    className={`relative flex flex-col md:flex-row ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'
-                      }`}
-                  >
-                    {/* Timeline dot */}
-                    <div className="absolute left-4 top-6 z-10 flex size-4 items-center justify-center md:left-1/2 md:top-6 md:-translate-x-1/2">
-                      <div className="size-4 rounded-full bg-primary ring-4 ring-primary/20" />
-                    </div>
-
-                    {/* Content */}
-                    <div
-                      className={`w-full pl-12 md:w-5/12 md:pl-0 ${isEven ? 'md:pr-12 md:text-right' : 'md:pl-12'
-                        }`}
-                    >
-                      <Card className="border-0 bg-muted/30 shadow-sm transition hover:shadow-md">
-                        <CardHeader>
-                          <div
-                            className={`mb-1 text-sm font-semibold text-primary ${isEven ? 'md:text-right' : ''
-                              }`}
-                          >
-                            {milestone.year}
-                          </div>
-                          <CardTitle className="text-xl">
-                            {milestone.title}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground">
-                            {milestone.description}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Empty spacer for layout */}
-                    <div className="hidden w-5/12 md:block" />
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ===== TRUST BADGES + CTA ===== */}
       <section className="border-t bg-muted/30 py-16 md:py-20">
         <div className="container mx-auto px-4 md:px-6">
@@ -385,16 +296,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* ===== FOOTER NOTE ===== */}
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <div className="container mx-auto px-4">
-          <p>
-            &copy; {new Date().getFullYear()} SmithShop. All rights reserved. Built
-            with ❤️ for gamers and digital enthusiasts.
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }
