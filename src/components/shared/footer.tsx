@@ -1,92 +1,93 @@
 import Link from 'next/link'
 import Logo from '@/components/shared/logo'
-import { User } from 'lucide-react'
+import {
+  IconBrandTelegram,
+  IconHeadset,
+  IconRobot,
+} from '@tabler/icons-react'
 
 // Navigation links
 const navLinks = [
-   { title: 'Products', href: '/products' },
-   { title: 'About', href: '/about' },
-   { title: 'Legal', href: '/legal' },
-   { title: 'Help', href: 'https://t.me/Smithdshop1' }
+  { title: 'Products', href: '/products' },
+  { title: 'About', href: '/about' },
+  { title: 'Legal', href: '/legal' },
+  { title: 'Help', href: 'https://t.me/Smithdshop1' },
 ]
 
-// Social links – using Lucide icons
+// Social / Contact links
 const socialLinks = [
-   {
-      href: '#',
-      icon: User,
-      ariaLabel: 'X/Twitter'
-   },
-   {
-      href: '#',
-      icon: User,
-      ariaLabel: 'LinkedIn'
-   },
-   {
-      href: '#',
-      icon: User,
-      ariaLabel: 'Facebook'
-   },
-   {
-      href: '#',
-      icon: User,
-      ariaLabel: 'Instagram'
-   },
-   {
-      href: '#',
-      icon: User,
-      ariaLabel: 'TikTok'
-   }
+  {
+    href: 'https://t.me/Smithdshop1',
+    icon: IconHeadset,
+    ariaLabel: 'Telegram Support',
+  },
+  {
+    href: 'https://t.me/Ethiosmith',
+    icon: IconBrandTelegram,
+    ariaLabel: 'Telegram Channel',
+  },
+  {
+    href: 'https://t.me/smithtopupbot',
+    icon: IconRobot,
+    ariaLabel: 'Telegram Bot',
+  },
 ]
 
 export default function Footer() {
-   return (
-      <footer className='py-16 md:py-32'>
-         <div className='mx-auto max-w-5xl px-6'>
+  return (
+    <footer className="py-16 md:py-32">
+      <div className="mx-auto max-w-5xl px-6">
+        <Link
+          href="/"
+          aria-label="Go home"
+          className="mx-auto block w-fit"
+        >
+          <Logo />
+        </Link>
+
+        {/* Navigation */}
+        <div className="my-8 flex flex-wrap justify-center gap-6 text-sm">
+          {navLinks.map((link) => (
             <Link
-               href='/'
-               aria-label='go home'
-               className='mx-auto block size-fit'
+              key={link.title}
+              href={link.href}
+              className="text-muted-foreground hover:text-primary transition-colors"
+              {...(link.href.startsWith('http')
+                ? {
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                }
+                : {})}
             >
-               <Logo />
+              {link.title}
             </Link>
+          ))}
+        </div>
 
-            {/* Navigation links – looped */}
-            <div className='my-8 flex flex-wrap justify-center gap-6 text-sm'>
-               {navLinks.map((link, index) => (
-                  <Link
-                     key={index}
-                     href={link.href}
-                     className='text-muted-foreground hover:text-primary block duration-150'
-                  >
-                     {link.title}
-                  </Link>
-               ))}
-            </div>
+        {/* Telegram Links */}
+        <div className="my-8 flex flex-wrap items-center justify-center gap-6">
+          {socialLinks.map((social) => {
+            const Icon = social.icon
 
-            {/* Social links – looped with Lucide icons */}
-            <div className='my-8 flex flex-wrap justify-center gap-6 text-sm'>
-               {socialLinks.map((social, index) => {
-                  const Icon = social.icon
-                  return (
-                     <Link
-                        key={index}
-                        href={social.href}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        aria-label={social.ariaLabel}
-                        className='text-muted-foreground hover:text-primary block'
-                     >
-                        <Icon className='size-6' />
-                     </Link>
-                  )
-               })}
-            </div>
+            return (
+              <Link
+                key={social.ariaLabel}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.ariaLabel}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Icon size={26} stroke={1.8} />
+              </Link>
+            )
+          })}
+        </div>
 
-            <span className='font-[cursive] text-muted-foreground block text-center text-sm'>
-               © {new Date().getFullYear()} SmithShop, All rights reserved
-            </span>
-         </div>
-      </footer>
-   )
+        <span className="text-muted-foreground block text-center text-sm">
+          © {new Date().getFullYear()} SmithShop. All rights reserved.
+        </span>
+      </div>
+    </footer>
+  )
 }
