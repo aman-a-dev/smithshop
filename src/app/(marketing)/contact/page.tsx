@@ -1,3 +1,4 @@
+"use client"
 import type { Metadata } from 'next'
 import { Mail, MapPin, Phone, Clock, Send, HelpCircle } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
