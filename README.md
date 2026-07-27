@@ -2,17 +2,13 @@
 
 An elegant marketplace web application for gaming and social media assets built on top of **Next.js**.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-98.8%25-3178C6?style=flat-square&logo=typescript)](/)
-<<<<<<< HEAD
-[![CSS](https://img.shields.io/badge/CSS-1.1%25-563D7C?style=flat-square&logo=css3)](/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-98.9%25-3178C6?style=flat-square&logo=typescript)](/)
+[![Other](https://img.shields.io/badge/Other-1.1%25-555555?style=flat-square)](/)
 [![Next.js](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
-=======
-[![Tailwindcss](https://img.shields.io/badge/CSS-1.1%25-563D7C?style=flat-square&logo=css3)](/)
-[![Next.js](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
-[![PrismaORM](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
-[![Better-Auth](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
-[![Shadcn](https://img.shields.io/badge/Next.js-Latest-000000?style=flat-square&logo=next.js)](https://nextjs.org)
->>>>>>> 6b8a064 (add legal page)
+[![Tailwindcss](https://img.shields.io/badge/Tailwind%20CSS-Latest-38B2AC?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma)](https://prisma.io)
+[![Better Auth](https://img.shields.io/badge/Better%20Auth-Latest-000000?style=flat-square)](https://better-auth.js.org)
+[![Shadcn/UI](https://img.shields.io/badge/Shadcn%2FUI-Components-000000?style=flat-square)](https://ui.shadcn.com)
 
 ---
 
@@ -36,35 +32,33 @@ An elegant marketplace web application for gaming and social media assets built 
 - 🎮 **Gaming Assets Marketplace** - Browse and purchase gaming-related digital assets
 - 📱 **Social Media Assets** - Discover premium social media content and resources
 - 💳 **Secure Transactions** - Safe and reliable payment processing
-- 🔐 **User Authentication** - Secure user accounts and profiles
+- 🔐 **User Authentication** - Secure user accounts and profiles with Better Auth
 - ⚡ **Fast Performance** - Server-side rendering and static generation with Next.js
 - 📱 **Responsive Design** - Mobile-first, fully responsive interface
-- 🔍 **Advanced Search** - Filter and search through marketplace items
-<<<<<<< HEAD
+- 🔍 **Advanced Search & Filtering** - Filter and search through marketplace items
 - ⭐ **Ratings & Reviews** - Community feedback and ratings system
-
-=======
 - 🔍 **Admin Panel** - For user and product management
->>>>>>> 6b8a064 (add legal page)
+- ❤️ **Favourites Functionality** - Save and manage favorite items
+
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
 - **Next.js** - React framework for production
+- **React 18+** - UI library
 - **TypeScript** - Type-safe JavaScript development
-<<<<<<< HEAD
-- **CSS** - Styling and responsive design
+- **Tailwind CSS** - Styling and responsive design
+- **Shadcn/UI** - Beautiful, accessible UI components
 
-### Key Technologies
-- React 18+
-- Server-side Rendering (SSR)
-- Static Site Generation (SSG)
-- API Routes
-=======
-- **Tailwindcss** - Styling and responsive design
-- **Shadcn/UI** - Base UL styled components
->>>>>>> 6b8a064 (add legal page)
+### Backend & Database
+- **Prisma ORM** - Database management and migrations
+- **Better Auth** - Authentication and authorization
+- **API Routes** - Next.js serverless functions
+
+### Development
+- **Server-side Rendering (SSR)** - Dynamic content rendering
+- **Static Site Generation (SSG)** - Pre-built static pages
 
 ---
 
@@ -96,13 +90,14 @@ Before you begin, ensure you have the following installed:
 
 3. **Set up environment variables:**
    ```bash
-<<<<<<< HEAD
    cp .env.example .env.local
-=======
-   cp .env
->>>>>>> 6b8a064 (add legal page)
    ```
    Fill in the required environment variables in `.env.local`.
+
+4. **Initialize the database (if using Prisma):**
+   ```bash
+   npx prisma migrate dev
+   ```
 
 ---
 
@@ -113,11 +108,8 @@ Before you begin, ensure you have the following installed:
 Start the development server:
 ```bash
 npm run dev
-<<<<<<< HEAD
 # or
 yarn dev
-=======
->>>>>>> 6b8a064 (add legal page)
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
@@ -132,28 +124,19 @@ The application will automatically reload when you make changes to the code.
 
 ```
 smithshop/
-<<<<<<< HEAD
-├── pages/              # Next.js pages and API routes
+├── app/                # Next.js app directory
 ├── components/         # Reusable React components
-├── styles/            # Global and module styles
-├── public/            # Static assets
-├── lib/               # Utility functions and helpers
-├── types/             # TypeScript type definitions
-├── .env.local         # Environment variables (local)
-└── package.json       # Project dependencies
-=======
-├── components/         # Reusable React components
-├── data/               # products data
-├── public/             # Static assets
 ├── lib/                # Utility functions and helpers
-├── .env.               # Environment variables (local)
-└── package.json        # Project dependencies
->>>>>>> 6b8a064 (add legal page)
+├── public/             # Static assets
+├── data/               # Products data
+├── .env.local          # Environment variables (local)
+├── package.json        # Project dependencies
+└── prisma/             # Prisma schema and migrations
 ```
 
 ### Code Style
 
-This project uses TypeScript for type safety and follows modern React best practices.
+This project uses TypeScript for type safety and follows modern React best practices with ESLint and Prettier.
 
 ---
 
@@ -162,21 +145,15 @@ This project uses TypeScript for type safety and follows modern React best pract
 Build the application for production:
 ```bash
 npm run build
-<<<<<<< HEAD
 # or
 yarn build
-=======
->>>>>>> 6b8a064 (add legal page)
 ```
 
 Start the production server:
 ```bash
 npm start
-<<<<<<< HEAD
 # or
 yarn start
-=======
->>>>>>> 6b8a064 (add legal page)
 ```
 
 ---
@@ -209,17 +186,16 @@ For questions, suggestions, or support, please open an issue on the [GitHub repo
 
 ## 🎯 Roadmap
 
+- [x] Core marketplace functionality
+- [x] User authentication
 - [ ] Advanced filtering and sorting
 - [ ] Payment gateway integration
 - [ ] User dashboard
-<<<<<<< HEAD
-- [ ] Wishlist functionality
-=======
 - [ ] Admin dashboard
-- [ ] Favourites functionality
->>>>>>> 6b8a064 (add legal page)
+- [ ] Wishlist functionality
 - [ ] Reviews and ratings system
 - [ ] Seller dashboard
+- [ ] Analytics and reporting
 
 ---
 
